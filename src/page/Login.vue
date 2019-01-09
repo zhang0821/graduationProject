@@ -9,12 +9,13 @@
         <div class="log-cloud cloud3"></div>
         <div class="log-cloud cloud4"></div>
 
-        <div class="log-logo">Welcome!</div>
-        <div class="log-text">@doterlin</div>
+        <div class="log-logo">环境监测系统SSSSSSSSSS</div>
+        <div class="log-text">@阶跃物联</div>
     </div>
     <div class="log-email">
         <input type="text" placeholder="Email" :class="'log-input' + (account==''?' log-input-empty':'')" v-model="account"><input type="password" placeholder="Password" :class="'log-input' + (password==''?' log-input-empty':'')"  v-model="password">
-        <a href="javascript:;" class="log-btn" @click="login">Login</a>
+        <a href="javascript:;" class="log-btn" @click="login">登录</a>
+        <a href="javascript:;" class="reg-btn" @click="regist">注册</a>
     </div>
     <Loading v-if="isLoging" marginTop="-30%"></Loading>
 </div>
@@ -26,13 +27,19 @@ export default {
   name: 'Login',
   data(){
   	return {
-      isLoging: false,
+        isLoging: false,
   		account: 'admin',
   		password: '123456'
   	}
   },
   components:{
     Loading
+  },
+  created() {
+      this.account='test',
+      this.password="123456"
+      //this.login()
+    //   this.regist()
   },
   methods:{
 
@@ -42,7 +49,15 @@ export default {
   		if(this.account!='' && this.password!=''){
   			this.toLogin();
   		}
-  	},
+      },
+      /**进入注册界面 */
+      regist(){
+          this.$router.push({
+                name:'Design',
+                params:{
+                }
+            })
+      },
 
   	//登录请求
   	toLogin(){
@@ -142,6 +157,13 @@ position: relative;}
 .isloading{background: #d6d6d6}
 .log-btn .icons{margin-left: 30px; vertical-align: middle;}
 .log-btn .text{left: 95px; line-height: 50px; text-align: left; position: absolute;}
+
+.reg-btn{
+    color: #50e3ce;
+    display: block;
+    margin: 0 auto 20px;
+
+}
 .log-input{width: 370px;overflow: hidden; padding: 0 15px;font-size: 13px; border: 1px solid #EBEBEB; margin:0 auto 15px; height: 48px; line-height: 48px; -webkit-border-radius: 5px;
 -moz-border-radius: 5px;
 -ms-border-radius: 5px;

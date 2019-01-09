@@ -1,15 +1,17 @@
 <template>
-    <div>
-    	<router-view></router-view>
-      <div>我是主页的其他内容样式</div>
-    </div>
-
-    
+  <div>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-export default {
-  name: 'app'
-}
+  export default {
+    name: 'app'
+  }
 </script>
+
+<style lang="scss">
+
+</style>
+
 

@@ -6,17 +6,24 @@ const myredis=require('./myredis')
 const socket=require('./socket')
 const sockEvent=socket.socketEvent
 
-const mqttClient = mqtt.connect('mqtt://10.149.72.156:1883')
+// const mqttClient = mqtt.connect('mqtt://10.149.65.47:1883')
+const mqttClient = mqtt.connect('mqtt://10.149.65.47:1883')
+
 
 mqttClient.on('connect', function () {
 	console.log('成功连接mqtt服务器');
-	mqttClient.subscribe('topics',{qos:2})
+	mqttClient.subscribe('loraPub',{qos:2})
 });
 
 mqttClient.on('message', function (topic, message) {
     switch(topic) {
-        case 'topics':
-            msgHander(message.toString())
+        case 'loraPub':
+            let time={
+                time:(new Date()).toString(),
+                timestamp:(new Date()).getTime()
+            }
+            console.log('订阅的loraPub收到消息',message.toString())
+            msgHander(message.toString(),time)
             break;
         case 'close':
             mqttClient.end()
@@ -28,20 +35,21 @@ mqttClient.on('message', function (topic, message) {
      let arr=msg.split("#")
      return {
          dev_eui:arr[0],
-         value:arr[1]        
+         status:Number(arr[1])
      }
  }
 
- let msgHander=(msg)=>{
+ let msgHander=(msg,timeObj)=>{
      if(msg){
         let info=devInfoObj(msg)
-        myredis.nodeSearch(info.dev_eui).then((resultObj)=>{
-            info=Object.assign(info,resultObj)
-            console.log("mqtt收到消息后进入信息广播发送")
-            sockEvent.unpdateMsgToClient(info,resultObj.area)
-        }).catch((err)=>{
-            console.log('未取到数据，无信息发送')
-        })
+        if(info.dev_eui != '080000000000001b'){
+            myredis.nodeSearch(info.dev_eui).then((resultObj)=>{
+                info=Object.assign(info,resultObj,timeObj)
+                sockEvent.updateMsgToClient(info,resultObj.area)
+            }).catch((err)=>{
+                console.log('未取到数据，无信息发送')
+            })
+        } 
      }
  }
  module.exports={

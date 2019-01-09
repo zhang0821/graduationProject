@@ -1,22 +1,32 @@
 <template>
 <div>
-    <div>我是主页内容</div>
-    <clock></clock>
-    <p>下面是ws测试</p>
+  <div id="box" ref="mybox">
     <ws-tool v-bind:username="username"></ws-tool>
+    <show-page v-bind:client-width="clientWidth" v-bind:client-height="clientHeight" v-bind:table-info="nodeInfo" v-bind:animat-info="nodeInfo"></show-page>
+    <button @click="testaction">testaction</button><button @click="anothertestaction">testaction</button>
+    <p>testaction当前的sss值是：{{testactionValue}}</p>
+  </div>
+    <!-- <my-table v-bind:info-sensor="nodeInfo"></my-table> -->
+    
 </div>
     
 </template>
 
 <script>
-
+import Vue from 'vue'
+import store from '../store'
 import wsTool from '../components/wsTest'
-import clock from '../components/myClock'
+import showPage from '../components/showPage'
+
+import { mapState, mapActions } from 'vuex'
+
 export default {
-  name: 'Maib',
+  name: 'Main',
   data(){
     return {
-  		username: ''
+      username: '',
+      clientWidth:1200,
+      clientHeight:600,
   	}
   	
   },
@@ -27,21 +37,47 @@ export default {
     }else{
       this.$router.push('/Login'); 
     }
+    this.$nextTick(() => { //使用nextTick,保证dom元素都已经渲染完毕再获取元素
+        this.clientWidth=document.getElementById("box").clientWidth
+        this.clientHeight=document.getElementById("box").clientHeight
+    });
     
   },
   components:{
     wsTool,
-    clock
+    showPage
   },
+  computed:mapState({
+    testactionValue:state=>state.dataTrans.testArr,
+    nodeInfo:state=>state.dataTrans.nodeInfo,
+  }),
   methods:{
-
-  	
-  }
+    testaction(){
+      this.$store.dispatch('dataTrans/testmyaction')
+    },
+    ...mapActions({
+      anothertestaction:'dataTrans/testmyaction'
+    }),
+    changeFixed(height,width){ //动态修改样式
+        this.$refs.mybox.style.height = height+'px';
+        this.$refs.mybox.style.width = width+'px';
+      },
+  },
+  mounted() {
+    window.onresize = () => { 
+          this.clientWidth=document.getElementById("box").clientWidth
+          this.clientHeight=document.getElementById("box").clientHeight
+          console.log('获取到的重载后的宽高',this.clientWidth,'\\',this.clientHeight)
+      }
+  },
 }
 </script>
 
 <style>
-div{
-    color:red;
+#box{
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  background: #ccc;
 }
 </style>

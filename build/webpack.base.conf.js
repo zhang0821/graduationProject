@@ -34,6 +34,14 @@ module.exports = {
         options: vueLoaderConfig
       },
       {
+        test: /\.sass$/,
+        loaders: ['style', 'css', 'sass','less']
+      },
+      {
+        test: /\.less$/,
+        loaders: ['style', 'css', 'less']
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'),resolve('serverTools'), resolve('test'),resolve('node_modules/vue-socket.io/dist')]

@@ -43,9 +43,7 @@
     </div>
 </template>
 <script>
-import {get_SsInfo_web,postRegistInfo} from '../js/tools/database'
 export default {
-    
     name:'nodeRegist',
     data(){
         return{
@@ -82,14 +80,14 @@ export default {
                 //参数合法性检查判断
             }
             if(this.warn == false){
-                postRegistInfo(this.info).then((data)=>{
+            //     postRegistInfo(this.info).then((data)=>{
                 console.log('服务器端配置函数收到数据',data)
-            })
+            // })
                 // console.log('返回配置信息到父组件')
                 // this.$emit('postregist', this.info) //返回配置信息到父组件
                 // console.log(this.$data)
                 // console.log(this.$listeners)
-                // this.$emit('child-cancle', false)
+                this.$emit('child-cancle', false)
             }
              
              // this.$dispatch('postRegistInfo',this.info)

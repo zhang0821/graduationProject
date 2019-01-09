@@ -72,7 +72,7 @@ export default {
   },
   props:['infoSensor'],
   created () {
-    
+    console.log('table组件被调用')
   },
   destroyed () {
   },

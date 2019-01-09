@@ -11,13 +11,18 @@ function hashPW(userName, pwd){
 // just for tutorial, it's bad really
 var userdb = [
     {
-      userName: "admin",
+      userName: "admin1",
       hash:  "123456",
       last: ""
     },
     {
-      userName: "foruok",
-      hash: "888888",
+      userName: "phy",
+      hash: "123456",
+      last: ""
+    },
+    {
+      userName: "test",
+      hash: "123456",
       last: ""
     }
   ];

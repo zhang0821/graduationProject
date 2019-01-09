@@ -1,10 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
-import BookAdmin from '@/components/BookAdmin'
-import BookList from '@/components/BookList'
 import Login from '@/page/Login'
 import Main from '@/page/Main'
+import Design from '@/page/Design'
 Vue.use(Router)
 
 export default new Router({
@@ -17,16 +15,16 @@ export default new Router({
     {
       path: '/Main',
       name: 'Main',
-      component: Main
+      component:  Main
     },
     {
-      path: '/bookAdmin',
-      name: 'BookAdmin',
-      component: BookAdmin
-    },
+      path: '/Design',
+      name: 'Design',
+      component: Design
+    }, 
     {
-      path: '/books',
-      component: BookList,
-    },
+      path: '*',
+      redirect: '/'
+    }
   ]
 })
