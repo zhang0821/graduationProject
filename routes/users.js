@@ -123,4 +123,7 @@ router.get('/logout', function(req, res, next){
   res.clearCookie("account");
 });
 
+router.post('/fileLoad', (req, res, next)=>{
+  console.log('接收到前端的文件上传')
+});
 module.exports = router;

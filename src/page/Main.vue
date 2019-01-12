@@ -15,8 +15,8 @@
 <script>
 import Vue from 'vue'
 import store from '../store'
-import wsTool from '../components/wsTest'
-import showPage from '../components/showPage'
+import wsTool from '../components/showItems/wsTest'
+import showPage from '../components/showItems/showPage'
 
 import { mapState, mapActions } from 'vuex'
 

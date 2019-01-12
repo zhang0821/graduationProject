@@ -9,7 +9,7 @@
         <div class="log-cloud cloud3"></div>
         <div class="log-cloud cloud4"></div>
 
-        <div class="log-logo">环境监测系统SSSSSSSSSS</div>
+        <div class="log-logo">环境监测系统</div>
         <div class="log-text">@阶跃物联</div>
     </div>
     <div class="log-email">
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import Loading from '../components/Loading.vue'
+import Loading from '../components/showItems/Loading.vue'
 export default {
   name: 'Login',
   data(){

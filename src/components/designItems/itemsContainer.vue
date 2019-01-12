@@ -1,8 +1,7 @@
 <template>
     <section class="preview" @dragover="dragOver" @drop="drop">
-        <h2>下面是元素放置区域SJDJD </h2>
         <div ref="preview" class="preview-area" @click="clickPreview"  @keyup.delete="del">
-
+            <node-show :infos="nodeAll" ></node-show>
         </div>
          <!-- 右键菜单 -->
 
@@ -10,6 +9,8 @@
     </section>
 </template>
 <script>
+import nodeShow from './utils/nodesInCon'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
     data(){
@@ -31,20 +32,55 @@ export default {
             previewMode: 'pc'
         }
     },
+    created(){
+
+    },
+    components:{
+        nodeShow
+    },
+    computed:mapState({
+        nodeAll:state=>state.designStore.designComponents,
+    }),
     methods: {
+        getCurPos(e){
+            e = e || window.event
+            var D = document.documentElement
+            var posInfo
+            if (e.pageX){
+                posInfo= {
+                    x: e.pageX,
+                    y: e.pageY
+                }
+            }else { 
+                posInfo={
+                    x: e.clientX + D.scrollLeft - D.clientLeft,   
+                    y: e.clientY + D.scrollTop - D.clientTop  
+                }  
+            }
+            return{
+                posx:Math.floor((posInfo.x-this.$refs.preview.getBoundingClientRect().left)/this.$refs.preview.clientWidth*10000)/10000,
+                posy:Math.floor((posInfo.y-this.$refs.preview.getBoundingClientRect().top)/this.$refs.preview.clientHeight*10000)/10000
+            }
+        },
+        ...mapMutations({
+            addNode:'designStore/addNodes'
+        }),
         dragOver(e) {
             e.preventDefault()
         },
         drop(e) { //松开拖放,e是容器元素
-
+            let storeNode={}
             //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
             if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                 return
 
-            let isNest = e.target.className.indexOf('preview') === -1 && e.target.id !== 'placeholder'
+            let mouse=this.getCurPos(e)
+            console.log("info具体信息",e.dataTransfer.getData('info'))
             let info = JSON.parse(e.dataTransfer.getData('info'))
-            console.log('当前元素是',info)
-           
+            Object.assign(storeNode,mouse,info)
+            console.log('存储元素',storeNode)
+            this.addNode(storeNode)
+
         },
         clickPreview(e) {
             let target = e.target
@@ -87,10 +123,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.preview{
-    width: 100%;
+.preview,.preview-area{
     height: 100%;
-    position: relative;
+}
+.preview-area{
+    border:2px solid #fff;
 }
 </style>
 
