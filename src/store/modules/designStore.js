@@ -3,7 +3,10 @@
 import axios from 'axios'
 const state = {
     
+<<<<<<< HEAD
 
+=======
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
     components: [], //预览视图的组件树
     
     copiedComponents: [],//复制的组件
@@ -12,7 +15,11 @@ const state = {
 
     designComponents:[], //放置在绘图区域内的组件信息,包括edv_eui,roomis,floor_id,posx,poy
 
+<<<<<<< HEAD
     designRoomInfo:{'pre':{}},  //  保存配置各个房间的信息，tem_high,...,以floor-room作为键值,在infoSetBox组件中被调用传参到registedInfo组件
+=======
+    designRoomInfo:{},  //  保存配置各个房间的信息，tem_high,...,以floor-room作为键值,在infoSetBox组件中被调用传参到registedInfo组件
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
 
     backupComponents:[],// 用于“上一步”，下一步的中转变量存储
     detialToolsBox:{
@@ -117,10 +124,18 @@ const mutations = {
         Object.assign(state, obj)
 
         //保存本地
+<<<<<<< HEAD
     },
     /** 保存新增的节点信息*/
     addNodes(state,obj){
         console.log('addNodeS被此次调用，传入的参数是',JSON.stringify(obj))
+=======
+        localStorage.store = JSON.stringify(state)
+    },
+    /** 保存新增的节点信息*/
+    addNodes(state,obj){
+        console.log('此次调用addNodeS传入的参数是',JSON.stringify(obj))
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
         if(!obj.id){//说明此处在拖拽节点
             Object.assign(obj,{
                 id:state.designComponents.length
@@ -131,15 +146,21 @@ const mutations = {
             let targetId=obj.id
             delete obj.id
             Object.assign( state.designComponents[targetId],obj) 
+<<<<<<< HEAD
 
             if(obj.floor_id){
                 //如果是在节点信息配置时，将配置的'floor-room'作为键进行保存
+=======
+            if(obj.floor_id){
+                //如果是在节点信息配置时，将配置的floor-room进行保存
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
                 let key_name=obj.floor_id+'-'+obj.room_id
                 if(!(key_name in state.designRoomInfo)){
                     Object.assign(state.designRoomInfo,{[key_name]:{}})
                     console.log('进入房间信息存储，目前的designRoomInfo信息',state.designRoomInfo)
                 }
             }
+<<<<<<< HEAD
         }  
         
     },
@@ -150,6 +171,15 @@ const mutations = {
         console.log('当前'+roomid+'房间里的数据时：',state.designRoomInfo[roomid])
 
 
+=======
+        }
+
+        console.log('此次调用addNodes后，参量信息：')
+        console.log('designComponents长度是：',state.designComponents.length,'具体信息是',JSON.stringify(state.designComponents))
+        console.log('目前的designRoomInfo长度是',Object.keys(state.designRoomInfo).length,'具体信息是',state.designRoomInfo)
+        
+        
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
     },
 
     /** 信息配置框是否显示状态修改*/

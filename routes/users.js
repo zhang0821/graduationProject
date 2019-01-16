@@ -121,6 +121,7 @@ router.get('/logout', function(req, res, next){
   res.clearCookie("account");
 });
 
+<<<<<<< HEAD
 router.post('/regist', (req, res, next)=>{
   let usr=req.param('data')
   console.log('新注册的用户信息是',usr)
@@ -136,5 +137,9 @@ router.post('/regist', (req, res, next)=>{
   })
 
 
+=======
+router.post('/fileLoad', (req, res, next)=>{
+  console.log('接收到前端的文件上传')
+>>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
 });
 module.exports = router;
