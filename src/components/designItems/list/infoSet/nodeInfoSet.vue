@@ -17,11 +17,8 @@
                <p v-if="errorText">{{errorText}}</p>
                 
             </ul>
-<<<<<<< HEAD
 
             
-=======
->>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
             <div class="btn-save" @click="save">保存配置</div>
         </div>
     </div>
@@ -49,11 +46,7 @@ export default {
                 this.errorText='请将信息填写完全'
                 return 
             }
-<<<<<<< HEAD
             this.$emit('child-info-save','dev',this.nodeId,this.info)
-=======
-            this.$emit('child-info-save',this.nodeId,this.info)
->>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
             this.errorText = null
             
         }
