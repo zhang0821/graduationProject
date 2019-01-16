@@ -1,7 +1,6 @@
 //登录
 
 <template>
-<<<<<<< HEAD
     <div>
         <div class="login" id="login" v-if="showLogin==1">
             <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
@@ -53,25 +52,6 @@
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
         </div>
-=======
-<div class="login" id="login">
-    <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
-    <div class="log-bg">
-        <div class="log-cloud cloud1"></div>
-        <div class="log-cloud cloud2"></div>
-        <div class="log-cloud cloud3"></div>
-        <div class="log-cloud cloud4"></div>
-
-        <div class="log-logo">环境监测系统</div>
-        <div class="log-text">@阶跃物联</div>
-    </div>
-    <div class="log-email">
-        <input type="text" placeholder="Email" :class="'log-input' + (account==''?' log-input-empty':'')" v-model="account"><input type="password" placeholder="Password" :class="'log-input' + (password==''?' log-input-empty':'')"  v-model="password">
-        <a href="javascript:;" class="log-btn" @click="login">登录</a>
-        <a href="javascript:;" class="reg-btn" @click="regist">注册</a>
-    </div>
-    <Loading v-if="isLoging" marginTop="-30%"></Loading>
->>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
 </div>
 
 
@@ -79,10 +59,7 @@
 
 <script>
 import Loading from '../components/showItems/Loading.vue'
-<<<<<<< HEAD
 import { setTimeout } from 'timers';
-=======
->>>>>>> f0b93de42d0a55c95cb0339360bdc79a59ba336c
 export default {
   name: 'Login',
   data(){
