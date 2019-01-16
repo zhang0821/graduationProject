@@ -1,31 +1,30 @@
 var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
-
-function hashPW(userName, pwd){
-  var hash = crypto.createHash('md5');
-  hash.update(userName + pwd);
-  return hash.digest('hex');
-}
-
 // just for tutorial, it's bad really
-var userdb = [
-    {
-      userName: "admin1",
-      hash:  "123456",
-      last: ""
-    },
-    {
-      userName: "phy",
-      hash: "123456",
-      last: ""
-    },
-    {
-      userName: "test",
-      hash: "123456",
-      last: ""
-    }
-  ];
+
+
+var fs=require('fs')
+var info=JSON.parse(fs.readFileSync('./routes/userInfo.json'))
+var userdb=info.userName
+
+// var userdb = [
+//     {
+//       userName: "admin1",
+//       hash:  "123456",
+//       last: ""
+//     },
+//     {
+//       userName: "phy",
+//       hash: "123456",
+//       last: ""
+//     },
+//     {
+//       userName: "test",
+//       hash: "123456",
+//       last: ""
+//     }
+//   ];
 
 function getLastLoginTime(userName){
   for(var i = 0; i < userdb.length; ++i){
@@ -98,7 +97,6 @@ router.requireAuthentication = function(req, res, next){
 
 router.post('/login', function(req, res, next){
   var userName = req.body.loginParam.login_username;
-  // var hash = hashPW(userName, req.body.login_password);
   var pwd = req.body.loginParam.login_password;
   console.log("login_username - " + userName + " password - " + pwd );
   switch(authenticate(userName, pwd)){
@@ -123,4 +121,20 @@ router.get('/logout', function(req, res, next){
   res.clearCookie("account");
 });
 
+router.post('/regist', (req, res, next)=>{
+  let usr=req.param('data')
+  console.log('新注册的用户信息是',usr)
+  userdb.push(usr)
+  let newObj={
+    "userName":userdb
+  }
+  fs.writeFile('./routes/userInfo.json',JSON.stringify(newObj),(err)=>{
+    if(err){
+      console.log('操作新增用户json文件失败')
+    }
+    res.send('新增用户成功')
+  })
+
+
+});
 module.exports = router;

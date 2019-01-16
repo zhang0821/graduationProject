@@ -1,35 +1,82 @@
 //登录
 
 <template>
-<div class="login" id="login">
-    <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
-    <div class="log-bg">
-        <div class="log-cloud cloud1"></div>
-        <div class="log-cloud cloud2"></div>
-        <div class="log-cloud cloud3"></div>
-        <div class="log-cloud cloud4"></div>
+    <div>
+        <div class="login" id="login" v-if="showLogin==1">
+            <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
+            <div class="log-bg">
+                <div class="log-cloud cloud1"></div>
+                <div class="log-cloud cloud2"></div>
+                <div class="log-cloud cloud3"></div>
+                <div class="log-cloud cloud4"></div>
 
-        <div class="log-logo">环境监测系统SSSSSSSSSS</div>
-        <div class="log-text">@阶跃物联</div>
-    </div>
-    <div class="log-email">
-        <input type="text" placeholder="Email" :class="'log-input' + (account==''?' log-input-empty':'')" v-model="account"><input type="password" placeholder="Password" :class="'log-input' + (password==''?' log-input-empty':'')"  v-model="password">
-        <a href="javascript:;" class="log-btn" @click="login">登录</a>
-        <a href="javascript:;" class="reg-btn" @click="regist">注册</a>
-    </div>
-    <Loading v-if="isLoging" marginTop="-30%"></Loading>
+                <div class="log-logo">环境监测系统</div>
+                <div class="log-text">@阶跃物联</div>
+            </div>
+            <div class="log-email">
+                <input type="text" placeholder="Email" :class="'log-input' + (account==''?' log-input-empty':'')" v-model="account"><input type="password" placeholder="Password" :class="'log-input' + (password==''?' log-input-empty':'')"  v-model="password">
+                <a href="javascript:;" class="log-btn" @click="login">登录</a>
+                <a href="javascript:;" class="reg-btn" @click="()=>{this.showLogin=0}">注册</a>
+            </div>
+            <Loading v-if="isLoging" marginTop="-30%"></Loading>
+        </div>
+
+
+        <div class="login regist" id="login" v-if="showLogin == 0">
+            <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
+            <div class="log-bg regist">
+                <div class="log-cloud cloud1"></div>
+                <div class="log-cloud cloud2"></div>
+                <div class="log-cloud cloud3"></div>
+                <div class="log-cloud cloud4"></div>
+
+                <div class="log-logo">新用户注册</div>
+            </div>
+
+            <div class="log-email" v-if="registSuccess==0">
+                <input type="text" placeholder="输入注册名" :class="'log-input' + (inputAct==''?' log-input-empty':'')" v-model="inputAct">
+                <input type="password" placeholder="输入密码" :class="'log-input' + (inputPWD==''?' log-input-empty':'')"  v-model="inputPWD">
+                <input type="password" placeholder="再次输入密码" :class="'log-input' + (inputPWDagain==''?' log-input-empty':'')"  v-model="inputPWDagain">
+                <input type="password" placeholder="输入手机号" class='log-input'  v-model="inputTel">
+                <input type="password" placeholder="输入邮箱" class='log-input'  v-model="inputEmail">
+
+                <p v-if="inputError!=null" class="inputError">{{inputError}}</p>
+
+                <a href="javascript:;" class="reg-btn" @click="regist">提交注册信息</a>
+            </div>
+            
+            <div v-if="registSuccess">
+                <div  class="registSuccess">注册成功</div>
+                <a href="javascript:;" class="reg-btn" @click="goDesign">进入配置页面</a>
+            
+            </div>
+            <Loading v-if="isLoging" marginTop="-30%"></Loading>
+        </div>
 </div>
+
+
 </template>
 
 <script>
-import Loading from '../components/Loading.vue'
+import Loading from '../components/showItems/Loading.vue'
+import { setTimeout } from 'timers';
 export default {
   name: 'Login',
   data(){
   	return {
+        showLogin:0,
         isLoging: false,
   		account: 'admin',
-  		password: '123456'
+        password: '123456',
+        
+        inputAct:'',
+        inputPWD:'',
+        inputPWDagain:'',
+        inputTel:'',
+        inputEmail:'',
+        inputError:null,
+        registSuccess:0
+
   	}
   },
   components:{
@@ -38,87 +85,97 @@ export default {
   created() {
       this.account='test',
       this.password="123456"
-      //this.login()
-    //   this.regist()
   },
   methods:{
 
   	//登录逻辑
   	login(){
-        console.log('进入login')
   		if(this.account!='' && this.password!=''){
   			this.toLogin();
   		}
       },
-      /**进入注册界面 */
-      regist(){
-          this.$router.push({
-                name:'Design',
-                params:{
-                }
-            })
-      },
-
-  	//登录请求
+      /**登录请求 */
   	toLogin(){
-
-  		//一般要跟后端了解密码的加密规则
-  		//这里例子用的哈希算法来自./js/sha1.min.js
-  		// let password_sha = hex_sha1(hex_sha1( this.password ));
-
-  		//需要想后端发送的登录参数
   		let loginParam = {
   			login_username: this.account,
   			login_password:this.password
   		}
 
-      //设置在登录状态
-      this.isLoging = true;
+        this.isLoging = true;
   		//请求后端,比如:
   		this.$http.post('/login', {loginParam}).then((response) => {
-              console.log('请求返回的数据',response.data)
-        if(response.data == "2"){
-            this.isLoging = false;
-        //   let expireDays = 1000 * 60 * 60 * 24 * 15;
-        //   this.setCookie('session', response.data.session, expireDays);
-          //登录成功后
-        //   this.$router.push('/Main'); 
-        this.$router.push({
-            name:'Main',
-            params:{
-                usr:this.account
+            if(response.data == "2"){
+                this.isLoging = false;
+                this.$router.push({
+                    name:'Main',
+                    params:{
+                        usr:this.account
+                    }
+                })
+            }else{
+                this.isLoging = false;
+                this.account=null;
+                this.password=null
             }
-        })
-        }else{
-            alert('失败'+response.data)
-            console.log('未成功返回数据')
-             this.isLoging = false;
-             this.account=null;
-             this.password=null
-        }
 	    }, (response) => {
-            //Error
-           this.isLoging = false;
-             this.account=null;
-             this.password=null
+            this.isLoging = false;
+            this.account=null;
+            this.password=null
 	    });
   	
   	   
-    //   //演示用
-  	// 	setTimeout(()=>{
-    //     //登录状态15天后过期
-    //     // let expireDays = 1000 * 60 * 60 * 24 * 15;
-  	// 	// 	this.setCookie('session','blablablablabla...', expireDays);
-    //     this.isLoging = false;
-    //     //登录成功后
-  	// 		this.$router.push('/Main/');
-  	// 	},3000)
-  	}
+      },
+
+    /**上传注册信息至服务器 */
+    regist(){
+        if(this.inputAct ==''){
+            this.inputError='请输入用户名'
+            return
+        }
+        if(this.inputPWD == '' || this.inputPWDagain == ''){
+            this.inputError = '请输入密码'
+            return
+        }
+
+        if(this.inputPWD != this.inputPWDagain){
+            this.inputError = '两次密码输入不同'
+            this.inputPWD=''
+            this.inputPWDagain=''
+            return
+        }
+        this.toRegist();
+    },
+    toRegist(){
+        let info={
+            'userName':this.inputAct,
+            'hash':this.inputPWDagain
+        }
+        this.isLoging = true; 
+        this.$http.post('/regist', {'data':info}).then((response) => {
+            this.registSuccess=1
+            this.isLoging=false
+            
+        }).catch(err=>{
+            this.isLoging=false
+            this.inputError='注册失败'
+        })  
+
+    },
+    /**跳转到设计页面 */
+    goDesign(){
+    this.$router.push({
+            name:'Design',
+            params:{
+            usr:this.inputAct
+            }
+        })
+    },
   }
 }
 </script>
 
-<style scoped>
+
+<style lang="scss" scoped>
 .login{position: fixed; overflow: hidden;left: 50%; margin-left: -250px; top:50%; margin-top: -350px; width: 500px; min-height: 555px; z-index: 10; right: 140px; background: #fff;-webkit-border-radius: 5px;
 -moz-border-radius: 5px;
 -ms-border-radius: 5px;
@@ -133,6 +190,25 @@ border-radius: 5px; -webkit-box-shadow:  0px 3px 16px -5px #070707; box-shadow: 
 .login .cloud3{top:160px; left: 5px;transform: scale(.8);animation: cloud3 21s linear infinite;}
 .login .cloud4{top:150px; left: -40px;transform: scale(.4);animation: cloud4 19s linear infinite;}
 .log-bg{background: url(../assets/login-bg.jpg); width: 100%; height: 312px; overflow: hidden;}
+.regist{
+    .log-bg{
+        height: 130px;
+    }
+    .log-logo{
+        margin-top:20px;
+    }
+}
+.registSuccess{
+    color: #1fcab3;
+    margin-top: 100px;
+    font-size: 30px;
+    text-align: center;
+}
+.inputError{
+    color: #f88787;
+    text-align: center;
+
+}
 .log-logo{height: 80px; margin: 120px auto 25px; text-align: center; color: #1fcab3; font-weight: bold; font-size: 40px;}
 .log-text{color: #57d4c3; font-size: 13px; text-align: center; margin: 0 auto;}
 .log-logo,.log-text{z-index: 2}

@@ -7,7 +7,7 @@
     <p>testaction当前的sss值是：{{testactionValue}}</p>
   </div>
     <!-- <my-table v-bind:info-sensor="nodeInfo"></my-table> -->
-    
+    <!-- <div @click="goDesign" class="goDesign">design</div> -->
 </div>
     
 </template>
@@ -15,8 +15,8 @@
 <script>
 import Vue from 'vue'
 import store from '../store'
-import wsTool from '../components/wsTest'
-import showPage from '../components/showPage'
+import wsTool from '../components/showItems/wsTest'
+import showPage from '../components/showItems/showPage'
 
 import { mapState, mapActions } from 'vuex'
 
@@ -62,6 +62,7 @@ export default {
         this.$refs.mybox.style.height = height+'px';
         this.$refs.mybox.style.width = width+'px';
       },
+      
   },
   mounted() {
     window.onresize = () => { 
@@ -79,5 +80,12 @@ export default {
   height: 100%;
   min-height: 600px;
   background: #ccc;
+}
+.goDesign{
+  position: absolute;
+  top:100px;
+  left: 50px;
+  background: #fff;
+  padding: 5px 10px;
 }
 </style>

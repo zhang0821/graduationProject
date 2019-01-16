@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="tem_hum">温度节点</div>
+        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="door">门禁节点</div>
     </div>
 </template>
 <script>
@@ -19,6 +19,6 @@ export default {
     color:#fff;
     padding: 10px 20px;
     border-radius: 20px;
-    background: rgb(36, 138, 179);
+    background:#8A5B47;
 }
 </style>

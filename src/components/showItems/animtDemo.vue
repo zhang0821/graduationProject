@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="sensorparsebox" ref="sensorparsebox">
         <!-- <div v-for="(room,index) in infos" :key="index" > -->
             <div v-if="infos.length !=0">
                 <div v-for="item in infos" >
@@ -34,11 +34,11 @@ export default {
     name:'animtDemo',
     data(){
         return{
-            // sensorContainerHeight:0,
-            // sensorContainerWidth:0,
+            sensorContainerHeight:0,
+            sensorContainerWidth:0,
         }
     },
-    props:['infos','sensorContainerHeight','sensorContainerWidth'],
+    props:['infos'],
     methods:{
 
     },
@@ -47,10 +47,18 @@ export default {
         // console.log('beforeCreate是animatede组件中收到消息',this.infos)
     },
     created() {
-        console.log('animatede组件中收到消息',this.infos)
+        const _self = this
+        _self.$nextTick(()=>{ //也可在mounted中执行
+             _self.sensorContainerWidth=_self.$refs.sensorparsebox.clientWidth
+            _self.sensorContainerHeight=_self.$refs.sensorparsebox.clientHeight
+        })
+    },
+    methods:{
+        
     },
     mounted() {
-        
+        // this.sensorContainerWidth=this.$refs.sensorparsebox.clientWidth
+        // this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
     },
     destroyed() {
         
@@ -59,6 +67,11 @@ export default {
 </script>
 
 <style scoped>
+.sensorparsebox{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
 @keyframes twinkling{
     0%{
       opacity:0.1; /*透明度为0*/

@@ -13,7 +13,7 @@
 <script>
 
 import Vue from 'vue'
-import store from '../store/'
+import store from '@/store/'
 import * as socketio from 'socket.io-client'
 import * as VueSocketIO from 'vue-socket.io'
 import { setTimeout, setInterval, clearInterval } from 'timers';
