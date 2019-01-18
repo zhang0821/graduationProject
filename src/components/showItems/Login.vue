@@ -45,7 +45,6 @@ export default {
 
   	//登录请求
   	toLogin(){
-
   		//一般要跟后端了解密码的加密规则
   		//这里例子用的哈希算法来自./js/sha1.min.js
   		let password_sha = hex_sha1(hex_sha1( this.password ));
@@ -58,21 +57,6 @@ export default {
 
       //设置在登录状态
       this.isLoging = true;
-      
-  		//请求后端,比如:
-  		/*this.$http.post( 'example.com/login.php', {
-  		param: loginParam).then((response) => {
-        if(response.data.code == 1){
-          let expireDays = 1000 * 60 * 60 * 24 * 15;
-          this.setCookie('session', response.data.session, expireDays);
-          //登录成功后
-          this.$router.push('/user_info'); 
-        }
-	    }, (response) => {
-	        //Error
-	    });
-  		*/
-  	   
       //演示用
   		setTimeout(()=>{
         //登录状态15天后过期
@@ -80,7 +64,7 @@ export default {
   			this.setCookie('session','blablablablabla...', expireDays);
         this.isLoging = false;
         //登录成功后
-  			this.$router.push('/bookAdmin/');
+  			// this.$router.push('');
   		},3000)
   	}
   }

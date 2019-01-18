@@ -1,15 +1,29 @@
 <template>
-    <section class="preview" @dragover="dragOver" @drop="drop">
-        <div ref="preview" class="preview-area" @click="clickPreview"  @keyup.delete="del">
-            <node-show :infos="nodeAll" ></node-show>
-        </div>
-         <!-- 右键菜单 -->
+    <section class="designcontainer">
+        <ul>
+            <li v-for="(tab,index) in Object.keys(tabArr)" :class="{active:index == curTab}" @click="showTab(index)" @dblclick="fileLoad(index)">{{tab}}</li>
+        </ul>
 
-        
+        <!-- <div v-for="(tab,index) in Object.keys(tabArr)" v-show="index == curTab"> -->
+
+            <div class="preview" ref="preview" @dragover="dragOver" @drop="drop">
+
+                <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)" v-if="index == curTab" @click="clickPreview" >
+                    <nodes-show :infos="tabArr[index].designComponents" ></nodes-show>
+                </div>  
+
+            </div>
+        <!-- </div> -->
+        <div v-if="showUploadBox" class="fileUploadBox">
+            <!-- <p>{{curTab}}</p> -->
+            <file-upload :file-done="finishUpload" :tabindex="curTab"></file-upload>
+        </div>
     </section>
+    
+    
 </template>
 <script>
-import nodeShow from './utils/nodesInCon'
+import utils from './utils'
 import { mapState, mapMutations } from 'vuex'
 
 export default {
@@ -29,17 +43,20 @@ export default {
                 position: null,
                 component: null
             },
-            previewMode: 'pc'
+            previewMode: 'pc',
+            /**tab也切换 */
+            curTab:'0',
+            showUploadBox:false
         }
     },
     created(){
 
     },
     components:{
-        nodeShow
+        ...utils
     },
     computed:mapState({
-        nodeAll:state=>state.designStore.designComponents,
+        tabArr:state=>state.designStore.pageTabs
     }),
     methods: {
         getCurPos(e){
@@ -69,7 +86,14 @@ export default {
             e.preventDefault()
         },
         drop(e) { //松开拖放,e是容器元素
-            let storeNode={}
+            //若此时没有初始化tab页，则也不允许元素被拖拽进入
+            if(Object.keys(this.tabArr).length < 0){
+                return
+            }
+
+            let storeNode={
+                tabIndex:this.curTab
+            }
             //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
             if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                 return
@@ -85,49 +109,64 @@ export default {
         clickPreview(e) {
             let target = e.target
             e.preventDefault()
-            // let componentHTML = this.getComponentNode(target)
-            // if (componentHTML) {
-            //     //添加选中效果
-            //     let list = document.querySelectorAll('[data-component-active="true"]')
-            //     list.forEach(el => {
-            //         el.setAttribute('data-component-active', '')
-            //     })
-            //     componentHTML.setAttribute('data-component-active', 'true')
-
-            //     //保存到vuex
-            //     let currentId = componentHTML.id
-            //     let component = this.components.find(component => component.info.id === currentId)
-            //     if (component)
-            //         this.$store.commit('setState', {
-            //             currentComponent: component
-            //         })
-            // }
         },
-        rightClick(e) {
-            this.clickPreview(e)
-            this.contextmenu.open = false
-            this.contextmenu.trigger = this.$refs.contextmenu
-            this.contextmenu.style = {
-                position: 'fixed',
-                left: e.x + 10 + 'px',
-                top: e.y - 10 + 'px'
-            }
-            this.contextmenu.open = true
+        showTab(tab){
+            this.curTab=tab
         },
-        del: async function() {
-            let components = await this.$store.dispatch('designStore/delComponent', this.current.info.id)
-            this.fresh()
+        /**双击添加背景图片 */
+        fileLoad(tabIndex){
+            console.log('tab页面：',tabIndex,'执行双击函数')
+            this.showUploadBox=true
         },
+        /**文件上传完成够组件传递的回调 */
+        finishUpload(){
+            console.log('文件传输完成，关闭文件传输框')
+            this.showUploadBox=false
+        }
     },
 }
 </script>
 
 <style lang="scss" scoped>
+.designcontainer{
+    // height: 100%;
+    ul{
+        width: 100%;
+        display: flex;
+        margin: 0;
+        color:#fff;
+        li{
+            list-style: none;
+            padding: 5px 30px;
+            border-radius: 20px 20px 0 0;
+            border:2px solid #fff;
+            background: rgb(205,92,92);
+            border-bottom: none;
+            &.active,&:hover{
+                cursor: pointer;
+                padding: 6px 35px;
+                background: #fff;
+                border-color: rgb(205,92,92);
+                color: rgb(205,92,92);
+            }
+
+        }
+    }
+}
 .preview,.preview-area{
     height: 100%;
 }
 .preview-area{
     border:2px solid #fff;
+}
+.fileUploadBox{
+    position:absolute;
+    padding: 10px 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 2px solid #ccc;
+
 }
 </style>
 

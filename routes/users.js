@@ -131,6 +131,7 @@ router.post('/regist', (req, res, next)=>{
   fs.writeFile('./routes/userInfo.json',JSON.stringify(newObj),(err)=>{
     if(err){
       console.log('操作新增用户json文件失败')
+      res.end()
     }
     res.send('新增用户成功')
   })

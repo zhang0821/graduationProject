@@ -2,7 +2,7 @@
     <div class="sensorparsebox" ref="sensorparsebox" @click="setParam">
         <div v-if="infos.length !=0" >
             <div v-for="item in infos" >
-                <div :class="item.type" 
+                <div :class="item.type"  class="nodes"
                         :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
                                     left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px',
                                     background:item.color }" 
@@ -89,6 +89,9 @@ $temHum: #446F9E;
 $smoke:rgba(214,190,46,0.6);
  
 .sensorparsebox{
+    .nodes{
+        cursor: pointer;
+    }
     width: 100%;
     height: 100%;
     position: relative;

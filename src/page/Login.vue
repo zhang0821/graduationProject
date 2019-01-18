@@ -47,8 +47,7 @@
             
             <div v-if="registSuccess">
                 <div  class="registSuccess">注册成功</div>
-                <a href="javascript:;" class="reg-btn" @click="goDesign">进入配置页面</a>
-            
+                <a href="javascript:;" class="reg-btn goDesign" @click="goDesign">进入配置页面</a>
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
         </div>
@@ -64,11 +63,13 @@ export default {
   name: 'Login',
   data(){
   	return {
-        showLogin:0,
+        /**登录相关信息 */
+        showLogin:1,
         isLoging: false,
-  		account: 'admin',
-        password: '123456',
+  		account: '',
+        password: '',
         
+        /**注册相关信息 */
         inputAct:'',
         inputPWD:'',
         inputPWDagain:'',
@@ -83,8 +84,9 @@ export default {
     Loading
   },
   created() {
-      this.account='test',
+      this.account='test'
       this.password="123456"
+        this.goDesign()
   },
   methods:{
 
@@ -122,8 +124,6 @@ export default {
             this.account=null;
             this.password=null
 	    });
-  	
-  	   
       },
 
     /**上传注册信息至服务器 */
@@ -163,10 +163,11 @@ export default {
     },
     /**跳转到设计页面 */
     goDesign(){
-    this.$router.push({
+        this.$router.push({
             name:'Design',
             params:{
-            usr:this.inputAct
+            // usr:this.inputAct
+            usr:'zhang'
             }
         })
     },
@@ -238,6 +239,15 @@ position: relative;}
     color: #50e3ce;
     display: block;
     margin: 0 auto 20px;
+
+    &.goDesign{
+        margin-top: 20px;
+        display: block;
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 25px;
+    }
 
 }
 .log-input{width: 370px;overflow: hidden; padding: 0 15px;font-size: 13px; border: 1px solid #EBEBEB; margin:0 auto 15px; height: 48px; line-height: 48px; -webkit-border-radius: 5px;

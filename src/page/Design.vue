@@ -1,10 +1,11 @@
 <template>
     <div class="designPage">
            
-        <div class="header" v-if="previewStatus==0">
+        <div class="header" v-if="designStore.previewClick==0">
     
             <div class="title">
                 <h1>可视化组态布局</h1>
+                <h4>当前登录用户：{{usr}}</h4>
             </div>
     
             <div class="operate">
@@ -27,18 +28,28 @@
     
         <div class="main">
     
-            <div class="itemsCon" v-if="previewStatus==0">
+            <div class="itemsCon" v-if="designStore.previewClick==0">
                 <componets-box class="myComp" ref="componetsBox" />
                 <!-- myComponents 使用ref属性后的元素，该元素则可以通过 this.$refs.myComponents 被作为DOM元素引用-->
             </div>
             <div class="designCon">
+                <div @click="imgUpLoad">
+                    点击添加背景图片
+                    <div>
+                        <input type="text" v-model="title" />
+                    </div>
+                    <div>
+                        <input type="text" v-model="subtitle" />                   
+                    </div>
+                </div>
+            
                 <componets-con></componets-con>
                 <loading v-if="isLoging" marginTop="-30%"></loading>
             </div>
 
             <!-- 配置相关细节信息 -->
-            <div class="toolCon" v-if="detialToolsBox.show && previewStatus==0">
-                <componets-set :curtype="detialToolsBox"></componets-set>
+            <div class="toolCon" v-if="designStore.detialToolsBox.show && designStore.previewClick==0">
+                <componets-set :curtype="designStore.detialToolsBox"></componets-set>
             </div>
         </div>
     
@@ -49,14 +60,15 @@ import componetsBox from '../components/designItems/componetsBox'
 import componetsCon from '../components/designItems/itemsContainer'
 import componetsSet from '../components/designItems/infoSetBox'
 import loading from '../components/showItems/Loading'
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 
     export default {
         name: 'Design',
         data() {
             return {
                 usr:'',
-                isLoging:0
+                isLoging:0,
+
             }
         },
         components:{
@@ -68,13 +80,36 @@ import { mapState, mapActions } from 'vuex';
         created() {
             this.usr=this.$route.params.usr
         },
-        computed:mapState({
-            detialToolsBox:state=>state.designStore.detialToolsBox,
-            previewStatus:state=>state.designStore.previewClick
-        }),
+        computed:{
+            ...mapState({
+                designStore:state=>state.designStore,
+            }), 
+            title:{
+                get:function(){
+                    return this.$store.state.designStore.layoutInfo.title
+                },
+                set:function(value){
+                    this.$store.commit('designStore/updateTitle', {'name':'title','titleText':value})
+                },
+            }, 
+            subtitle:{
+                get:function(){
+                    return this.$store.state.designStore.layoutInfo.subtitle
+                },
+                set:function(value){
+                   this.$store.commit('designStore/updateTitle',{'name':'subtitle','titleText':value})
+                }
+            }        
+            
+        },
         methods: {          
             ...mapActions({
-                postData:'designStore/postToServer'
+                postData:'designStore/postToServer',
+                imgUpLoad:'designStore/imgUpLoad',
+            }),
+            ...mapMutations({
+                textSave:'designStore/textSave',
+                updateTitle:'designStore/updateTitle'
             }),
             /**编辑 */
             draw() {

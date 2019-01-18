@@ -34,7 +34,7 @@ export default {
 
         }
     },
-    props:['']
+    props:['registedInfosObj']
 }
 </script>
 

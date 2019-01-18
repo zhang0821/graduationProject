@@ -1,10 +1,9 @@
 <template>
 <div>
   <div id="box" ref="mybox">
-    <ws-tool v-bind:username="username"></ws-tool>
+    <!-- <ws-tool v-bind:username="username"></ws-tool> -->
+
     <show-page v-bind:client-width="clientWidth" v-bind:client-height="clientHeight" v-bind:table-info="nodeInfo" v-bind:animat-info="nodeInfo"></show-page>
-    <button @click="testaction">testaction</button><button @click="anothertestaction">testaction</button>
-    <p>testaction当前的sss值是：{{testactionValue}}</p>
   </div>
     <!-- <my-table v-bind:info-sensor="nodeInfo"></my-table> -->
     <!-- <div @click="goDesign" class="goDesign">design</div> -->
@@ -40,23 +39,22 @@ export default {
     this.$nextTick(() => { //使用nextTick,保证dom元素都已经渲染完毕再获取元素
         this.clientWidth=document.getElementById("box").clientWidth
         this.clientHeight=document.getElementById("box").clientHeight
+
+        this.$store.dispatch('dataTrans/basicNodesInfo',{'usr':this.username})
     });
-    
   },
   components:{
     wsTool,
     showPage
   },
   computed:mapState({
-    testactionValue:state=>state.dataTrans.testArr,
     nodeInfo:state=>state.dataTrans.nodeInfo,
   }),
   methods:{
-    testaction(){
-      this.$store.dispatch('dataTrans/testmyaction')
-    },
+    // testaction(){
+    //   this.$store.dispatch('dataTrans/testmyaction')
+    // },
     ...mapActions({
-      anothertestaction:'dataTrans/testmyaction'
     }),
     changeFixed(height,width){ //动态修改样式
         this.$refs.mybox.style.height = height+'px';
