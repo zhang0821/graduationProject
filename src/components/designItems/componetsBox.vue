@@ -6,6 +6,7 @@
             <ul class="type-list" @click="UItypeChoose" v-if="showDropMenu">
                 <li>节点</li>
                 <li>布局</li>
+                <li>通用组件</li>
             </ul>          
         </div>
         
@@ -35,6 +36,12 @@
                     <div draggable="true" @dragstart="dragStart" comp-type="layout" data-name='warnBox'>报警框</div>
                 </li>
                 
+            </ul>
+
+            <ul class="components-list common" v-if="this.UItype==='通用组件'">
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='warnBox'>报警框</div>
+                </li> 
             </ul>
         </div>
     </section>

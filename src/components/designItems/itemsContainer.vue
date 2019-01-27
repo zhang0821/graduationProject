@@ -1,7 +1,7 @@
 <template>
     <section v-if="operateType=='design'" class="designcontainer">
         <ul>
-            <li v-for="(tab,index) in Object.keys(tabArr)" :class="{active:index == curTab}" @click="showTab(index)" @dblclick="fileLoad(index)">{{tab}}</li>
+            <li v-for="(tab,index) in Object.keys(tabArr)" :class="{active:index == curTab}" @click="showTab(index)" @dblclick="fileLoad(tabArr[index].name)">{{tab}}</li>
         </ul>
 
 
@@ -10,8 +10,10 @@
                 <nodes-show :infos="tabArr[index].designComponents" ></nodes-show>
             </div>  
             
+            <!-- 是否注册了报警 -->
             <text-scroll-box v-if="layoutInfo.warnBox"></text-scroll-box>
         </div>
+            <!-- 文件上传组件 -->
             <div v-if="showUploadBox" class="fileUploadBox">
                 <i class="close" @click="finishUpload">x</i>
                 <input type="text" v-model="tabName">

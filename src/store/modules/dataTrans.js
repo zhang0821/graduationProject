@@ -41,7 +41,7 @@ const mutations = {
     setAllComponets(state,dataObj){
         state.allComponents=dataObj
         console.log('展示所有组件信息',state.allComponents)
-    }
+    },
 }
 export default {
     namespaced : true,

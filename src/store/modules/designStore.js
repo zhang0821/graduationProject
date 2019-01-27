@@ -188,33 +188,16 @@ const mutations = {
         }else{
             state.layoutInfo=Object.assign({},state.layoutInfo,obj)
         }
+    },
+
+    /**
+     *与后台数据传输相关 
+     */
+    /**接收mqtt传来信息，更新全局存储节点的变量 */
+    updateNodesList(state,obj){
+        console.log('接收，mqtt数据被调用，传入的数据是',obj)
+        // state.pageTabs[obj.tab_id].designComponents=Object.assign({},state.pageTabs[obj.tab_id]) 
     }
-
-
-    // addNodes_before(state,obj){
-    //     console.log('addNodeS被此次调用，传入的参数是',JSON.stringify(obj))
-    //     if(!obj.id){//说明此处在拖拽节点
-    //         Object.assign(obj,{
-    //             id:state.designComponents.length
-    //         })
-    //         state.designComponents.push(obj)
-    //     }else{ //说明在注册节点信息
-    //         ////此处要先删除obj的id键值
-    //         let targetId=obj.id
-    //         delete obj.id
-    //         Object.assign( state.designComponents[targetId],obj) 
-
-    //         if(obj.floor_id){
-    //             //如果是在节点信息配置时，将配置的'floor-room'作为键进行保存
-    //             let key_name=obj.floor_id+'-'+obj.room_id
-    //             if(!(key_name in state.designRoomInfo)){
-    //                 Object.assign(state.designRoomInfo,{[key_name]:{}})
-    //                 console.log('进入房间信息存储，目前的designRoomInfo信息',state.designRoomInfo)
-    //             }
-    //         }
-    //     }  
-        
-    // },
 }
 export default {
     namespaced : true,

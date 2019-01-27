@@ -22,12 +22,14 @@
 
         </div>
       <div @click="goDesign" class="goDesign">design</div>
+      <final-mqtt :username="usr"></final-mqtt>
     </div>
 </template>
 <script>
 import componetsCon from '../components/designItems/itemsContainer'
 import loading from '../components/showItems/Loading'
 import utils from '../components/designItems/utils'
+import mainShow from "../components/showItems";
 import { mapState, mapActions, mapMutations } from 'vuex';
 
     export default {
@@ -41,7 +43,8 @@ import { mapState, mapActions, mapMutations } from 'vuex';
         components:{
             componetsCon,
             loading,
-            ...utils
+            ...utils,
+            ...mainShow
         },
         created() {
           if(this.$route.params.usr){
