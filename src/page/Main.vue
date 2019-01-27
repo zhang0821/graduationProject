@@ -1,89 +1,133 @@
 <template>
-<div>
-  <div id="box" ref="mybox">
-    <!-- <ws-tool v-bind:username="username"></ws-tool> -->
-
-    <show-page v-bind:client-width="clientWidth" v-bind:client-height="clientHeight" v-bind:table-info="nodeInfo" v-bind:animat-info="nodeInfo"></show-page>
-  </div>
-    <!-- <my-table v-bind:info-sensor="nodeInfo"></my-table> -->
-    <!-- <div @click="goDesign" class="goDesign">design</div> -->
-</div>
+    <div class="mainPage">
+           
+        <div class="header">
     
+            <div class="title">
+                <h1>{{designStore.layoutInfo.title}}</h1>
+                <h4>{{designStore.layoutInfo.subtitle}}</h4>
+            </div>
+        	<audio v-if="designStore.layoutInfo.fireMusic" :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" controls="controls"  id="music"  loop="loop" hidden="hidden"  preload="auto">
+            </audio>
+        </div>
+        <div class="designCon">
+            <div class="nodePosInfo">
+                <componets-con :operate-type="'show'"></componets-con>
+            </div>
+            <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
+        </div>
+          
+        <div class="warnScroll">
+            <text-scroll-box></text-scroll-box>
+
+        </div>
+      <div @click="goDesign" class="goDesign">design</div>
+    </div>
 </template>
-
 <script>
-import Vue from 'vue'
-import store from '../store'
-import wsTool from '../components/showItems/wsTest'
-import showPage from '../components/showItems/showPage'
+import componetsCon from '../components/designItems/itemsContainer'
+import loading from '../components/showItems/Loading'
+import utils from '../components/designItems/utils'
+import { mapState, mapActions, mapMutations } from 'vuex';
 
-import { mapState, mapActions } from 'vuex'
-
-export default {
-  name: 'Main',
-  data(){
-    return {
-      username: '',
-      clientWidth:1200,
-      clientHeight:600,
-  	}
-  	
-  },
-  created() {
-    if(this.$route.params.usr !== undefined){
-      this.username=this.$route.params.usr
-      console.log('进入main函数中',this.username)
-    }else{
-      this.$router.push('/Login'); 
+    export default {
+        name: 'Design',
+        data() {
+            return {
+                usr:this.$store.state.dataTrans.username,
+                isLoging:0,
+            }
+        },
+        components:{
+            componetsCon,
+            loading,
+            ...utils
+        },
+        created() {
+          if(this.$route.params.usr){
+            this.usr=this.$route.params.usr
+          }else{
+            this.usr=this.$store.state.dataTrans.username
+          }
+        },
+        computed:{
+            ...mapState({
+                designStore:state=>state.designStore,
+            }),    
+            
+        },
+        methods: {          
+            ...mapActions({
+            }),
+            ...mapMutations({
+                
+            }),
+            goDesign(){
+              this.$router.push({
+                  name:'Design',
+                  params:{
+                      usr:this.$store.state.dataTrans.username
+                  }
+              })
+            }
+   
+        },
     }
-    this.$nextTick(() => { //使用nextTick,保证dom元素都已经渲染完毕再获取元素
-        this.clientWidth=document.getElementById("box").clientWidth
-        this.clientHeight=document.getElementById("box").clientHeight
-
-        this.$store.dispatch('dataTrans/basicNodesInfo',{'usr':this.username})
-    });
-  },
-  components:{
-    wsTool,
-    showPage
-  },
-  computed:mapState({
-    nodeInfo:state=>state.dataTrans.nodeInfo,
-  }),
-  methods:{
-    // testaction(){
-    //   this.$store.dispatch('dataTrans/testmyaction')
-    // },
-    ...mapActions({
-    }),
-    changeFixed(height,width){ //动态修改样式
-        this.$refs.mybox.style.height = height+'px';
-        this.$refs.mybox.style.width = width+'px';
-      },
-      
-  },
-  mounted() {
-    window.onresize = () => { 
-          this.clientWidth=document.getElementById("box").clientWidth
-          this.clientHeight=document.getElementById("box").clientHeight
-          console.log('获取到的重载后的宽高',this.clientWidth,'\\',this.clientHeight)
-      }
-  },
-}
 </script>
-
-<style>
-#box{
-  width: 100%;
-  height: 100%;
-  min-height: 600px;
-  background: #ccc;
+<style lang="scss">
+.mainPage{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: #699;
+    display: flex;
+    flex-direction: column;
+    .header{
+        width: 100%;
+        height: 100px;
+        background: #000;
+        .title{
+            text-align: center;
+            line-height: 100px;color: #fff;padding: 0 10px;
+            // margin-left:auto;margin-right: auto;
+        }
+    }
+    .designCon{
+        flex:1;
+        width: 100%;
+        background:rgb(139 , 180, 192);
+        display: flex;
+        flex-direction: column;
+        .nodePosInfo{
+            width: 100%;
+            flex: 1;
+            // height: 100%;
+        }
+    }
+    .warnScroll{
+        width: 100%;
+        height: 50px;
+        background: #ccc;
+    }
+        
+    
 }
 .goDesign{
   position: absolute;
-  top:100px;
-  left: 50px;
+  width: 80px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 20px;
+  top:-30px;
+  left:  calc(100%-40px);
+//   transform: translateX(-50%);
   background: #fff;
-  padding: 5px 10px;
+  &:hover{
+    cursor: pointer;
+    left: calc(100%-80px);
+    top:0;
+    // transform: translateX(-100%);
+  }
 }
 </style>

@@ -3,6 +3,8 @@ import axios from 'axios'
 
 const state = {
     nodeInfo:data,
+    username:'',
+    allComponents:{}
 }
 const getters = {
 
@@ -33,6 +35,13 @@ const mutations = {
         console.log('mqtt传入更新新节点',newInfo)//载荷可以是一个对象
         state.nodeInfo.push(newInfo)        
     },
+    setUserName(state,name){
+        state.username=name
+    },
+    setAllComponets(state,dataObj){
+        state.allComponents=dataObj
+        console.log('展示所有组件信息',state.allComponents)
+    }
 }
 export default {
     namespaced : true,

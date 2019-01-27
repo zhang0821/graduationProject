@@ -36,9 +36,14 @@ export default {
             }
         }
     },
-    props:['nodeType','nodeId'],
+    props:['nodeType','nodeId','tabId'],
     components:{
         ...utils
+    },
+    created(){
+        console.log('显示信息配置界面，传入参数是：nodeType',this.nodeType,'nodeId:',this.nodeId,'tabId:',this.tabId)
+        this.info=Object.assign(this.info,this.$store.state.designStore.pageTabs[this.tabId].designComponents[this.nodeId])
+        console.log('该节点对应的相关信息是：',this.info)
     },
     methods:{
         save(){

@@ -30,6 +30,10 @@
                 <li @click="layoutTab">
                     <span>减少tab页</span><i class="tab-icon-del">-</i>
                 </li>
+
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="layout" data-name='warnBox'>报警框</div>
+                </li>
                 
             </ul>
         </div>
@@ -53,14 +57,15 @@ export default {
 
     methods: {
         dragStart(e) {
-            let componentName = e.target.getAttribute('data-name')
-            console.log(' e.target:', e.target.style.backgroundColor)
+            let compType=e.target.getAttribute('comp-type')
+            let componentName = e.target.getAttribute('data-name') 
             let info = {
+                compType:compType,
                 type: componentName,
                 width:e.target.offsetWidth,
                 height:e.target.offsetHeight,
-                color:e.target.style.background
             }
+            
             e.dataTransfer.setData('info', JSON.stringify(info))
         },
 

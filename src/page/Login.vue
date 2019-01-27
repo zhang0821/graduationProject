@@ -20,7 +20,7 @@
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
         </div>
-
+        
 
         <div class="login regist" id="login" v-if="showLogin == 0">
             <a href="javascript:;" class="log-close"><i class="icons close"></i></a>
@@ -37,8 +37,8 @@
                 <input type="text" placeholder="输入注册名" :class="'log-input' + (inputAct==''?' log-input-empty':'')" v-model="inputAct">
                 <input type="password" placeholder="输入密码" :class="'log-input' + (inputPWD==''?' log-input-empty':'')"  v-model="inputPWD">
                 <input type="password" placeholder="再次输入密码" :class="'log-input' + (inputPWDagain==''?' log-input-empty':'')"  v-model="inputPWDagain">
-                <input type="password" placeholder="输入手机号" class='log-input'  v-model="inputTel">
-                <input type="password" placeholder="输入邮箱" class='log-input'  v-model="inputEmail">
+                <input type="text" placeholder="输入手机号" class='log-input'  v-model="inputTel">
+                <input type="text" placeholder="输入邮箱" class='log-input'  v-model="inputEmail">
 
                 <p v-if="inputError!=null" class="inputError">{{inputError}}</p>
 
@@ -86,7 +86,7 @@ export default {
   created() {
       this.account='test'
       this.password="123456"
-        this.goDesign()
+    //   this.goDesign()
   },
   methods:{
 
@@ -106,7 +106,17 @@ export default {
         this.isLoging = true;
   		//请求后端,比如:
   		this.$http.post('/login', {loginParam}).then((response) => {
-            if(response.data == "2"){
+          
+              console.log('登录页面返回数据信息',response)
+              if(response.data.state == "3"){ //转到设计页面
+                this.$router.push({
+                        name:'Design',
+                        params:{
+                            usr:this.account
+                        }
+                    })
+                    this.$store.commit('dataTrans/setUserName',this.account)
+              }else if(response.data.state == "2"){
                 this.isLoging = false;
                 this.$router.push({
                     name:'Main',
@@ -114,16 +124,20 @@ export default {
                         usr:this.account
                     }
                 })
-            }else{
+                this.$store.commit('designStore/initDesignState',response.data.data)
+                this.$store.commit('dataTrans/setAllComponets',response.data.data)
+                this.$store.commit('dataTrans/setUserName',this.account)
+             }else{
                 this.isLoging = false;
                 this.account=null;
                 this.password=null
             }
-	    }, (response) => {
-            this.isLoging = false;
-            this.account=null;
-            this.password=null
-	    });
+          },
+          (response) => {
+                this.isLoging = false;
+                this.account=null;
+                this.password=null
+          });
       },
 
     /**上传注册信息至服务器 */
@@ -148,7 +162,9 @@ export default {
     toRegist(){
         let info={
             'userName':this.inputAct,
-            'hash':this.inputPWDagain
+            'hash':this.inputPWDagain,
+            'tel':this.inputTel,
+            'email':this.inputEmail
         }
         this.isLoging = true; 
         this.$http.post('/regist', {'data':info}).then((response) => {
@@ -163,13 +179,14 @@ export default {
     },
     /**跳转到设计页面 */
     goDesign(){
+        this.inputAct='zhang'
         this.$router.push({
             name:'Design',
             params:{
-            // usr:this.inputAct
-            usr:'zhang'
+                usr:this.inputAct
             }
         })
+        this.$store.commit('dataTrans/setUserName',this.inputAct)
     },
   }
 }

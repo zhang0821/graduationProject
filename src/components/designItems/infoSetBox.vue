@@ -3,9 +3,10 @@
 
     <div class="nodeSetBox">
         <!-- 节点信息的相关配置 -->
-        <ul v-if="curtype.rangeType == 'NODE'">
+        <ul v-if="toolBoxInfo.rangeType == 'NODE'">
             <!-- 显示要注册的节点信息 -->
-            <node-info-set :node-type="curtype.nodeType" :node-id="curtype.itemId" v-on:child-info-save="saveNodeSet"/>
+            <node-info-set :node-type="toolBoxInfo.nodeType" :tabId="toolBoxInfo.tabId" :node-id="toolBoxInfo.nodeId" v-on:child-info-save="saveNodeSet"/>
+            
             <!-- 如果有房间被注册，则显示此处用于注册房间 -->
             <div v-show="Object.keys(registedInfosObj).length>0">
                  <registed-info v-bind:registed-infos="registedInfosObj"  ref="childregist" v-on:child-info-save="saveNodeSet"/>
@@ -14,7 +15,7 @@
         </ul>
 
         <!-- 布局相关的信息配置 -->
-        <ul v-if="curtype.rangeType == 'LAYOUT'">
+        <ul v-if="toolBoxInfo.rangeType == 'LAYOUT'">
             布局相关
         </ul>
 
@@ -33,7 +34,7 @@ export default {
             showflag:0,
         }
     },
-    props:['curtype'],
+    props:['toolBoxInfo'],
     created(){
 
     },

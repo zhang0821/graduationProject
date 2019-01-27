@@ -33,8 +33,12 @@
                 <!-- myComponents 使用ref属性后的元素，该元素则可以通过 this.$refs.myComponents 被作为DOM元素引用-->
             </div>
             <div class="designCon">
-                <div @click="imgUpLoad">
-                    点击添加背景图片
+                <div class="basicInfo">
+                    <div @click="showMediaUpload">
+                        点击添加告警音乐
+                         
+                    </div>
+                    <!-- <img :src="require('../../userUpload/'+usr+'/bgImgOftab0.png')" alt="测试动态路径图片"> -->
                     <div>
                         <input type="text" v-model="title" />
                     </div>
@@ -42,17 +46,23 @@
                         <input type="text" v-model="subtitle" />                   
                     </div>
                 </div>
-            
-                <componets-con></componets-con>
+                <div class="nodePosInfo">
+                    <componets-con :operate-type="'design'"></componets-con>
+                </div>
                 <loading v-if="isLoging" marginTop="-30%"></loading>
             </div>
 
             <!-- 配置相关细节信息 -->
             <div class="toolCon" v-if="designStore.detialToolsBox.show && designStore.previewClick==0">
-                <componets-set :curtype="designStore.detialToolsBox"></componets-set>
+                <componets-set :tool-box-info="designStore.detialToolsBox" ></componets-set>
             </div>
         </div>
-    
+
+        <!-- 上传文件选择框 -->
+        <div class="fileUploadBox" v-if="mediaUpload">
+            <i class="close" @click="closeBox">x</i>
+            <file-upload :file-done="closeBox" :type="'media'"></file-upload>
+        </div>
     </div>
 </template>
 <script>
@@ -60,6 +70,7 @@ import componetsBox from '../components/designItems/componetsBox'
 import componetsCon from '../components/designItems/itemsContainer'
 import componetsSet from '../components/designItems/infoSetBox'
 import loading from '../components/showItems/Loading'
+import utils from '../components/designItems/utils'
 import { mapState, mapActions, mapMutations } from 'vuex';
 
     export default {
@@ -68,17 +79,22 @@ import { mapState, mapActions, mapMutations } from 'vuex';
             return {
                 usr:'',
                 isLoging:0,
-
+                mediaUpload:false
             }
         },
         components:{
             componetsBox,
             componetsCon,
             componetsSet,
-            loading
+            loading,
+            ...utils
         },
         created() {
-            this.usr=this.$route.params.usr
+            if(this.$route.params.usr){
+                this.usr=this.$route.params.usr
+            }else{
+                this.usr=this.$store.state.dataTrans.username
+            }
         },
         computed:{
             ...mapState({
@@ -99,7 +115,7 @@ import { mapState, mapActions, mapMutations } from 'vuex';
                 set:function(value){
                    this.$store.commit('designStore/updateTitle',{'name':'subtitle','titleText':value})
                 }
-            }        
+            }     
             
         },
         methods: {          
@@ -108,9 +124,17 @@ import { mapState, mapActions, mapMutations } from 'vuex';
                 imgUpLoad:'designStore/imgUpLoad',
             }),
             ...mapMutations({
-                textSave:'designStore/textSave',
                 updateTitle:'designStore/updateTitle'
             }),
+            showMediaUpload(){
+                this.mediaUpload=true
+                console.log('showUploadBox当前状态值',this.mediaUpload)
+            },
+            closeBox(){
+                this.mediaUpload=false
+                console.log('showUploadBox当前状态值',this.mediaUpload)
+
+            },
             /**编辑 */
             draw() {
             },
@@ -129,6 +153,10 @@ import { mapState, mapActions, mapMutations } from 'vuex';
                 }).catch((err) => {
                     console.log('postdata错误')
                 });
+                //重新跳转到登录界面
+                 this.$router.push({
+                    name:'Login'
+                })
             },
     
             /**保存
@@ -208,6 +236,18 @@ import { mapState, mapActions, mapMutations } from 'vuex';
             flex: 1;
             height: 100%;
             background:rgb(139 , 180, 192);
+            display: flex;
+            flex-direction: column;
+            .basicInfo{
+                width: 100%;
+                height: auto;
+                min-height: 100px;
+                background: #ccc;
+            }
+            .nodePosInfo{
+                width: 100%;
+                flex: 1;
+            }
         }
         .itemsCon{
             width: auto;
@@ -233,6 +273,28 @@ import { mapState, mapActions, mapMutations } from 'vuex';
     overflow-y:auto;
     overflow-x:hidden;
     background:indianred;
+
+}
+.fileUploadBox{
+    position:absolute;
+    padding: 26px 5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 2px solid #000;
+    z-index: 10;
+    .close{
+        display: block;
+        width: 18px;
+        height: 18px;
+        margin-top: -22px;
+        &:hover{
+            cursor: pointer;
+        }
+    }
+    .setTabName{
+        width: 100%;       
+    }
 
 }
 </style>

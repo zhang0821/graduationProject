@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="smoke" v-bind:class="[(state == 0)? 'normal' : 'warn','sensor']" draggable="true" @dragstart="dragStartFn" data-name="smoke">烟雾节点</div>
+        <div ref="smoke" v-bind:class="[(state == 0)? 'normal' : 'warn','sensor']" draggable="true" @dragstart="dragStartFn" data-name="smoke" comp-type="node">烟雾节点</div>
     </div>
 </template>
 <script>

@@ -3,23 +3,23 @@
         <h4>已注册楼层&房间信息</h4>
         <ul class="roomBox">
             <li v-for="room in Object.keys(registedInfos)">
-                <i class="room-btn" :class="{'hasSetted':(room.registed !=null) }" @click="setThresh(room)">{{room}}</i>
+                <i class="room-btn"  v-bind:class="[{'hasSetted':(registedInfos[room].registed == 1 ? true:false)}]" @click="setThresh(room)">{{room}}</i>
             </li>
         </ul>
 
         <div v-if="showDetiaSetBox">
              <ul class="roomConfig" :class="{'error':(errorText !=null) }">
                 <li >
-                    <label for="">最高温度<input type="textbox"  v-model="info.tempMax" placeholder=""></label>
-                    <label for="">最低温度<input type="textbox"  v-model="info.tempMin" placeholder=""></label>
+                    <label for="">最高温度<input type="textbox"  v-model="registedInfos[roomId].tempMax" placeholder=""></label>
+                    <label for="">最低温度<input type="textbox"  v-model="registedInfos[roomId].tempMin" placeholder=""></label>
                 </li>
                 <li >
-                    <label for="">最高湿度<input type="textbox"  v-model="info.humiMax" placeholder=""></label>
-                    <label for="">最低湿度<input type="textbox"  v-model="info.humiMin" placeholder=""></label>
+                    <label for="">最高湿度<input type="textbox"  v-model="registedInfos[roomId].humiMax" placeholder=""></label>
+                    <label for="">最低湿度<input type="textbox"  v-model="registedInfos[roomId].humiMin" placeholder=""></label>
                 </li>
                 <li >
-                    <label for="">氨气阈值<input type="textbox"  v-model="info.nh4Max" placeholder=""></label>
-                    <label for="">硫化氢阈值<input type="textbox"  v-model="info.h2sMax" placeholder=""></label>
+                    <label for="">氨气阈值<input type="textbox"  v-model="registedInfos[roomId].nh4Max" placeholder=""></label>
+                    <label for="">硫化氢阈值<input type="textbox"  v-model="registedInfos[roomId].h2sMax" placeholder=""></label>
                 </li>
                <p v-if="errorText">{{errorText}}</p>
                 
@@ -38,7 +38,7 @@ export default {
             },
             showDetiaSetBox:0,
             errorText:'',
-            roomId:0
+            roomId:null
         }
     },
     props:['registedInfos'],
@@ -55,9 +55,9 @@ export default {
         }
     },
     methods:{
-        validInfo(){
-            for(var item in this.info){
-                if(this.info[item] == null){
+        validInfo(obj){
+            for(var item in obj){
+                if(obj[item] == null){
                     return false
                 }
             
@@ -66,15 +66,13 @@ export default {
         },
         save(){
            this.errorText = null
-           if(!this.validInfo()){
-                this.errorText='填写信息有误'
+           if(!this.validInfo(this.registedInfos[this.roomId])){
+                this.errorText='填写信息不全'
                 return 
             }
             
-            this.$emit('child-info-save','room',this.roomId,this.info)
+            this.$emit('child-info-save','room',this.roomId,this.registedInfos[this.roomId])
             this.showDetiaSetBox=0;
-            
-
         },
         /**页面元素内容的强制刷新 */
         renderRefresh(){
@@ -83,6 +81,7 @@ export default {
         /**具体阈值信息配置 */
         setThresh(room){
             this.showDetiaSetBox=1
+            console.log('当前要配置的房间号是',room)
             this.roomId=room
         }
     }
@@ -101,7 +100,7 @@ export default {
     .roomBox{
         display: flex;
         li{
-
+            margin-left: 10px;
         }
         .room-btn{
             display: inline-block;
@@ -123,6 +122,8 @@ export default {
         height: auto;
         color: #000;
         margin-top: 10px;
+        padding:10px;
+        border: 1px solid #fff;
         li{
             display: flex;
             justify-content: space-around;

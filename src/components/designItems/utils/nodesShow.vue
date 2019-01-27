@@ -6,7 +6,10 @@
                         :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
                                     left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px',
                                     background:item.color }" 
-                        :data-arrId="item.id" >{{item.type}}           
+                        :data-arrId="item.id"  :data-tabIndex="item.tabIndex">
+                        <!-- {{item.tabIndex+'-'+item.id}} -->
+                        <i v-if="item.dev_eui">{{item.dev_eui}}</i>
+                        <i v-else>{{item.type}}</i>
                 </div>
 
             </div>
@@ -25,6 +28,13 @@ export default {
         }
     },
     props:['infos'],
+    created() {
+        const _self = this
+        _self.$nextTick(()=>{ //也可在mounted中执行
+             _self.sensorContainerWidth=_self.$refs.sensorparsebox.clientWidth
+            _self.sensorContainerHeight=_self.$refs.sensorparsebox.clientHeight
+        })
+    },
     computed:mapMutations({
 
     }),
@@ -34,11 +44,13 @@ export default {
         }),
         setParam(e){
             let itemId=e.target.getAttribute('data-arrId'),
-            itemType=e.target.className
-            if(itemId != null){
-                this.showToolsBoxChange({show:1,rangeType:'NODE',nodeType:itemType,itemId:itemId})
+                tabId=e.target.getAttribute('data-tabIndex'),
+                itemType=e.target.className
+            console.log('nodesShow中的setparam被调用，此时获取到tabId是',tabId)
+            if(itemId != null || tabId!=null){
+                this.showToolsBoxChange({show:1,rangeType:'NODE',nodeType:itemType,nodeId:itemId,tabId:tabId})
             }else{
-                this.showToolsBoxChange({show:0,type:null,rangeType:null,itemId:null})
+                this.showToolsBoxChange({show:0,type:null,rangeType:null,nodeId:null,tabId:tabId})
             }
             this.$nextTick(()=>{ //也可在mounted中执行
                 this.sensorContainerWidth=this.$refs.sensorparsebox.clientWidth
@@ -48,13 +60,7 @@ export default {
     },
     beforeCreate() {
     },
-    created() {
-        const _self = this
-        _self.$nextTick(()=>{ //也可在mounted中执行
-             _self.sensorContainerWidth=_self.$refs.sensorparsebox.clientWidth
-            _self.sensorContainerHeight=_self.$refs.sensorparsebox.clientHeight
-        })
-    },
+   
     watch:{
       
     //     // 父级异步加载的数据 props 方式给到 当前子级

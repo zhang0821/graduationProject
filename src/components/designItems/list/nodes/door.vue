@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="door">门禁节点</div>
+        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="door" comp-type="node">门禁节点</div>
     </div>
 </template>
 <script>

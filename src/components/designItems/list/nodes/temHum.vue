@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="tem_hum">温度节点</div>
+        <div ref="tem_hum" class="sensor" draggable="true" @dragstart="dragStartFn" data-name="tem_hum" comp-type="node">温度节点</div>
     </div>
 </template>
 <script>
