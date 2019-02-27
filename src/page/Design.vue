@@ -16,7 +16,7 @@
                 <ul>
                     <li @click="complete">提交</li>
                     <li @click="save">保存</li>
-                    <li @click="empty">清空</li>
+                    <li @click="emptyState()">清空</li>
                 </ul>
                 <ul>
                     <li @click="step_forward">上一步</li>
@@ -34,10 +34,7 @@
             </div>
             <div class="designCon">
                 <div class="basicInfo">
-                    <div @click="showMediaUpload">
-                        点击添加告警音乐
-                         
-                    </div>
+                    <div @click="showMediaUpload">点击重新添加告警音乐</div>
                     <!-- <img :src="require('../../userUpload/'+usr+'/bgImgOftab0.png')" alt="测试动态路径图片"> -->
                     <div>
                         <input type="text" v-model="title" />
@@ -71,7 +68,9 @@ import componetsCon from '../components/designItems/itemsContainer'
 import componetsSet from '../components/designItems/infoSetBox'
 import loading from '../components/showItems/Loading'
 import utils from '../components/designItems/utils'
-import { mapState, mapActions, mapMutations } from 'vuex';
+import {createNamespacedHelpers} from 'vuex'
+const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designStore')
+// import { mapState, mapActions, mapMutations } from 'vuex'
 
     export default {
         name: 'Design',
@@ -98,7 +97,7 @@ import { mapState, mapActions, mapMutations } from 'vuex';
         },
         computed:{
             ...mapState({
-                designStore:state=>state.designStore,
+                designStore:state=>state,
             }), 
             title:{
                 get:function(){
@@ -119,13 +118,14 @@ import { mapState, mapActions, mapMutations } from 'vuex';
             
         },
         methods: {          
-            ...mapActions({
-                postData:'designStore/postToServer',
-                imgUpLoad:'designStore/imgUpLoad',
-            }),
-            ...mapMutations({
-                updateTitle:'designStore/updateTitle'
-            }),
+            ...mapActions([
+                'imgUpLoad',
+                'postToServer'
+            ]),
+            ...mapMutations([
+                'updateTitle',
+                'emptyState'
+            ]),
             showMediaUpload(){
                 this.mediaUpload=true
                 console.log('showUploadBox当前状态值',this.mediaUpload)
@@ -147,11 +147,11 @@ import { mapState, mapActions, mapMutations } from 'vuex';
             complete() {
                 // 提交信息到服务器
                 this.isLoging=1
-                this.postData({'usr':this.usr}).then((result) => {
+                this.postToServer({'usr':this.usr}).then((result) => {
                     console.log('数据提交后服务器返回结果',result)
                     this.isLoging=0
                 }).catch((err) => {
-                    console.log('postdata错误')
+                    console.log('postToServer错误')
                 });
                 //重新跳转到登录界面
                  this.$router.push({
@@ -166,12 +166,6 @@ import { mapState, mapActions, mapMutations } from 'vuex';
                 localStorage.setItem('cacheInfo',JSON.stringify(this.$store.state.designStore))
                 console.log('保存的信息是',localStorage.getItem('cacheInfo'))
             },
-    
-            /**清空 */
-            empty() {
-                
-            },
-    
             /**上一步 */
             step_forward() {
     

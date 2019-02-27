@@ -1,6 +1,6 @@
 import editBox from './editBox.vue'
-import myDiv from './div.vue'
+import textScrollBox from './textScrollBox.vue'
 export default{
     editBox,
-    myDiv
+    textScrollBox
 }

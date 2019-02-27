@@ -1,7 +1,7 @@
 <template>
-     <div class="marquee">
+     <div class="marquee" @contextmenu.prevent="showMenu('1')">
         <div class="marquee_title">
-            <span>最新战报</span>
+            <span>报警消息</span>
         </div>
         <div class="marquee_box">
             <ul class="marquee_list" :class="{marquee_top:animate}">
@@ -12,44 +12,56 @@
                     <span v-else-if="item.type == 'door'">门禁传感器报警</span>
                     <span v-else-if="item.type == 'water'">水浸传感器报警</span>
                     <span v-else-if="item.type == 'air'">气体传感器报警!当前氨气：{{item.nh4}},湿度：{{item.h2s}}</span>
-
                 </li>
             </ul>
         </div>
+          <!-- 节点右键菜单弹出 -->
+                            <vue-context-menu :contextMenuData="contextMenuData"
+                            :transferIndex="transferIndex"
+                            @delete="deleteItem('warnBox')"
+                            @modify="modifyItem"></vue-context-menu>
     </div>
 </template>
 
 <script>
+import {mapState,mapMutations} from 'vuex'
 export default {
     data(){
         return {
             animate: false,
-            marqueeList:[
-                {
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'tem_hum',
-                    tempValue:88,
-                    humiValue:80
+
+            transferIndex: null, // Show the menu that was clicked
+            contextMenuData: {
+                menuName: 'demo',
+                axis: {
+                    x: null,
+                    y: null
                 },
-                {
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'air',
-                    nh4:88,
-                    h2s:80
-                },
-                {
-                    
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'smoke',
-                }
-            ]
+                menulists: [
+                    {
+                    fnHandler: 'delete',
+                    icoName: 'fa fa-fw',
+                    btnName: '移除'
+                    }
+                ]
+            }
         }
     },
     created() {
-        setInterval(this.showMarquee, 2000)
+        setInterval(this.showMarquee, 5000)
+    },
+    computed:{
+        ...mapState('dataTrans',{
+            marqueeList:state=>state.warnInfo
+        }),
+        ...mapMutations({
+            deleteItem:'designStore/deleteItem'
+        })
+    },
+    updated:{
+        marqueeList:(val)=>{
+            console.log('marqueeList值发生改变',val)
+        }
     },
     methods: {
         showMarquee: function () {
@@ -59,6 +71,20 @@ export default {
             this.marqueeList.shift();
             this.animate = false;
         },500)},
+
+         /**右键菜单 */
+        showMenu (index) {
+            this.transferIndex = index // tranfer index to child component
+            event.preventDefault()
+            var x = event.clientX
+            var y = event.clientY
+            this.contextMenuData.axis = {
+            x, y
+            }
+        },
+        modifyItem () {
+            console.log('修改样式')
+        }
     }
 }
 </script>
@@ -74,8 +100,8 @@ div, ul, li, span, img {
 	width: 100%;
 	height: 50px;
 	align-items: center;
-	color: #3A3A3A;
-	background-color: #b3effe;
+	color: #fff;
+	background-color: #8bb4c0;
 	display: flex;
 	box-sizing: border-box;
 }
@@ -83,9 +109,10 @@ div, ul, li, span, img {
 .marquee_title {
 	padding: 0 20px;
 	height: 30px;
-	font-size: 14px;
+	font-size: 20px;
 	border-right: 1px solid #d8d8d8;
 	align-items: center;
+    color: red;
 }
 
 .marquee_box {

@@ -1,22 +1,30 @@
 <template>
-    <div class="sensorparsebox" ref="sensorparsebox" @click="setParam" >
+    <div class="sensorparsebox" ref="sensorparsebox" @click="hidSetParamBox">
         <div v-if="infos.length !=0" >
             <div v-for="item in infos" v-if="design === 'design'">
-                    <div  :class="item.type"  class="nodes"
-                            :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
-                                        left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px'}" 
-                            draggable="true" @dragstart="dragStart" @contextmenu.prevent="showMenu(item.id)"
-                            :data-arrId="item.id"  :data-tabIndex="item.tabIndex" >
-                            <!-- {{item.tabIndex+'-'+item.id}} -->
-                            <i v-if="item.dev_eui">{{item.dev_eui}}</i>
-                            <i v-else>{{item.type}}</i>
+                        <div  :class="item.type"  class="nodes"
+                                :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
+                                            left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px'}" 
+                                :data-arrId="item.id"  :data-tabIndex="item.tabIndex" @contextmenu.prevent="showMenu(item.id)">
+                                <!-- {{item.tabIndex+'-'+item.id}} -->
+                                <!-- <i v-if="item.dev_eui">{{item.dev_eui}}</i>
+                                <i v-else>{{item.type}}</i> -->
+                                <section v-if="item.type == 'smoke'">
+                                    <smoke />
+                                </section>
+                                <section v-else-if="item.type == 'tem_hum'">
+                                    <temhum />
+                                </section>
+                                <section v-else>
+                                    <door v-on:child-click-event="setParam" draggingState="itemNode" :data="item"/>
+                                </section>
 
-                            <!-- 节点右键菜单弹出 -->
-                            <vue-context-menu :contextMenuData="contextMenuData"
-                            :transferIndex="transferIndex"
-                            @delete="deleteItem({tabIndex:item.tabIndex,id:item.id})"
-                            @modify="modifyItem"></vue-context-menu>
-                    </div>
+                                <!-- 节点右键菜单弹出 -->
+                                <vue-context-menu :contextMenuData="contextMenuData"
+                                :transferIndex="transferIndex"
+                                @delete="deleteItem({tabIndex:item.tabIndex,id:item.id})"
+                                @modify="modifyItem"></vue-context-menu>
+                        </div>
             </div>
             
             <div v-else>
@@ -51,7 +59,7 @@
 </template>
 <script>
 import { mapMutations, mapState } from 'vuex';
-
+import nodes from '../list/nodes'
 export default {
     name:'animtDemo',
     data(){
@@ -90,6 +98,9 @@ export default {
             _self.sensorContainerHeight=_self.$refs.sensorparsebox.clientHeight
         })
     },
+    components:{
+        ...nodes,
+    },
     computed:{
         listenNodesChange(){
             return this.$store.state.dataTrans.listenChange
@@ -114,10 +125,22 @@ export default {
              deleteItem:'designStore/deleteItem'
         }),
         /**点击配置参数 */
-        setParam(e){
-            let itemId=e.target.getAttribute('data-arrId'),
-                tabId=e.target.getAttribute('data-tabIndex'),
-                itemType=e.target.className
+        // setParam(e){
+        //     let itemId=e.target.getAttribute('data-arrId'),
+        //         tabId=e.target.getAttribute('data-tabIndex'),
+        //         itemType=e.target.className
+        //     console.log('nodesShow中的setparam被调用，此时获取到tabId是',tabId)
+        //     if(itemId != null || tabId!=null){
+        //         this.showToolsBoxChange({show:1,rangeType:'NODE',nodeType:itemType,nodeId:itemId,tabId:tabId})
+        //     }else{
+        //         this.showToolsBoxChange({show:0,type:null,rangeType:null,nodeId:null,tabId:tabId})
+        //     }
+        //     this.$nextTick(()=>{ //也可在mounted中执行
+        //         this.sensorContainerWidth=this.$refs.sensorparsebox.clientWidth
+        //         this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
+        //     })
+        // },
+        setParam(tabId=null,itemId=null,itemType=null){
             console.log('nodesShow中的setparam被调用，此时获取到tabId是',tabId)
             if(itemId != null || tabId!=null){
                 this.showToolsBoxChange({show:1,rangeType:'NODE',nodeType:itemType,nodeId:itemId,tabId:tabId})
@@ -129,22 +152,13 @@ export default {
                 this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
             })
         },
-        /**拖拽事件 */
-        dragStart(e) {
-            let info = {
-                compType:'node',
-
-                changePos:true,
-                tabId:e.target.getAttribute('data-tabIndex'),
-                itemType:e.target.className,
-                itemId:e.target.getAttribute('data-arrId'),
-
-                width:e.target.offsetWidth,
-                height:e.target.offsetHeight,
-
-            } 
-            e.dataTransfer.setData('info', JSON.stringify(info))
-        },
+        hidSetParamBox(){
+            this.showToolsBoxChange({show:0,type:null,rangeType:null,nodeId:null,tabId:tabId}),
+            this.$nextTick(()=>{ //也可在mounted中执行
+                this.sensorContainerWidth=this.$refs.sensorparsebox.clientWidth
+                this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
+            })
+        }
         /**右键菜单 */
         showMenu (index) {
             this.transferIndex = index // tranfer index to child component
@@ -205,7 +219,7 @@ $smoke:rgba(214,190,46,0.6);
     div{
         position: absolute;
         text-align:center;
-        width:30px;height:30px;border-radius:50% 50%;
+        // width:30px;height:30px;border-radius:50% 50%;
         &.door{
             background-color: $door;
             &.offLine{

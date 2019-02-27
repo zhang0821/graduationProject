@@ -45,18 +45,19 @@ export default {
         registedInfosObj:state=>state.designStore.designRoomInfo
     }),
     methods:{
-        ...mapMutations({
-            setInfoStore:'designStore/setInfoStore',
-            addNodeInfo:'designStore/addNodes',
-            setRoomInfo:'designStore/setRoomInfo',
-        }),
+        ...mapMutations('designStore',[
+            'setInfoStore',
+            'addNodes',
+            'setRoomInfo'
+        ]),
         saveNodeSet(type,id,obj){
-            this.$forceUpdate();
+            console.log("触发saveNodeSet,要保存的信息是obj:",obj)
+            this.$forceUpdate()
             let inserObj=null
             if(type == 'dev'){
                 inserObj=Object.assign(obj,{'id':id})
                     console.log('NodeInfoSet中提交配置，配置信息提交,配置的id是',id,"配置的信息是",JSON.stringify(obj),'inserObj:',JSON.stringify(inserObj))
-                this.addNodeInfo(inserObj)
+                this.addNodes(inserObj)
                     console.log('registedInfosObj的值在点击提交后是',this.registedInfosObj,'','长度:',Object.keys(this.registedInfosObj).length)
             }else{
                     inserObj=Object.assign(obj,{'room_id':id,'registed':1})

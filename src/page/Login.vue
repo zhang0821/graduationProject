@@ -10,7 +10,7 @@
                 <div class="log-cloud cloud3"></div>
                 <div class="log-cloud cloud4"></div>
 
-                <div class="log-logo">环境监测系统</div>
+                <div class="log-logo">实验室安全监测系统</div>
                 <div class="log-text">@阶跃物联</div>
             </div>
             <div class="log-email">
@@ -35,6 +35,7 @@
 
             <div class="log-email" v-if="registSuccess==0">
                 <input type="text" placeholder="输入注册名" :class="'log-input' + (inputAct==''?' log-input-empty':'')" v-model="inputAct">
+                <input type="text" placeholder="管理区域名" :class="'log-input' + (inputAct==''?' log-input-empty':'')" v-model="inputArea">
                 <input type="password" placeholder="输入密码" :class="'log-input' + (inputPWD==''?' log-input-empty':'')"  v-model="inputPWD">
                 <input type="password" placeholder="再次输入密码" :class="'log-input' + (inputPWDagain==''?' log-input-empty':'')"  v-model="inputPWDagain">
                 <input type="text" placeholder="输入手机号" class='log-input'  v-model="inputTel">
@@ -47,7 +48,7 @@
             
             <div v-if="registSuccess">
                 <div  class="registSuccess">注册成功</div>
-                <a href="javascript:;" class="reg-btn goDesign" @click="goDesign">进入配置页面</a>
+                <!-- <a href="javascript:;" class="reg-btn goDesign" @click="goDesign">进入配置页面</a> -->
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
         </div>
@@ -71,6 +72,7 @@ export default {
         
         /**注册相关信息 */
         inputAct:'',
+        inputArea:'',
         inputPWD:'',
         inputPWDagain:'',
         inputTel:'',
@@ -109,24 +111,31 @@ export default {
           
               console.log('登录页面返回数据信息',response)
               if(response.data.state == "3"){ //转到设计页面
+              console.log('跳转进入设计页面,返回携带的数据信息是',response.data.data)
                 this.$router.push({
                         name:'Design',
                         params:{
-                            usr:this.account
+                            usr:this.account,
+                            info:response.data.data
                         }
                     })
                     this.$store.commit('dataTrans/setUserName',this.account)
               }else if(response.data.state == "2"){
-                this.isLoging = false;
+                console.log('跳转进入主页面,返回携带的数据信息是',response.data.data)
+
+                // this.$store.commit('designStore/initSavedInfos',response.data.data)
+                // this.$store.commit('dataTrans/setAllComponets',response.data.data)
+                this.$store.commit('dataTrans/setUserName',this.account)
+                
+                this.isLoging = false
                 this.$router.push({
                     name:'Main',
                     params:{
-                        usr:this.account
+                        usr:this.account,
+                        info:response.data.data
                     }
                 })
-                this.$store.commit('designStore/initDesignState',response.data.data)
-                this.$store.commit('dataTrans/setAllComponets',response.data.data)
-                this.$store.commit('dataTrans/setUserName',this.account)
+
              }else{
                 this.isLoging = false;
                 this.account=null;
@@ -146,6 +155,11 @@ export default {
             this.inputError='请输入用户名'
             return
         }
+        if(this.inputArea ==''){
+            this.inputError='请输入监测区域'
+            return
+        }
+
         if(this.inputPWD == '' || this.inputPWDagain == ''){
             this.inputError = '请输入密码'
             return
@@ -162,15 +176,20 @@ export default {
     toRegist(){
         let info={
             'userName':this.inputAct,
-            'hash':this.inputPWDagain,
+            'area':this.inputArea,
+            'pwd':this.inputPWDagain,
             'tel':this.inputTel,
             'email':this.inputEmail
         }
         this.isLoging = true; 
         this.$http.post('/regist', {'data':info}).then((response) => {
             this.registSuccess=1
-            this.isLoging=false
+            setTimeout(()=>{
+                this.isLoging=false
+                this.showLogin=1//返回登录页面
+            },2000)
             
+            console.log('注册页面返回的信息是',response.data)
         }).catch(err=>{
             this.isLoging=false
             this.inputError='注册失败'

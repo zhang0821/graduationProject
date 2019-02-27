@@ -3,6 +3,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 const state = {
+    
     // components: [], //预览视图的组件树
 
     /**存储节点信息 */
@@ -32,21 +33,17 @@ const state = {
         fireMusic:false,
         warnBox:{
             hasSet:0,
+
         }
     },
     /**保存每个页面节点信息 */
     pageTabs:{
         0:{
-            name:'默认',
+            name:'一楼',
             imgload:false,
-            designComponents:[],
-            table:{
-                hasSet:false
-            }
+            designComponents:[]
         }
     }
-
-    
 
 }
 const getters = {
@@ -66,7 +63,7 @@ const actions = {
                 }
               }).then(response=>{
                   console.log('后台返回的数据是',response) //response涵盖的内容是整个请求相关的参数
-                  resolve(response.data) //会返回已经存在的节点，即，节点的唯一标识号是唯一的
+                  resolve(response.data)
               }).catch(e=>{
                   reject(e)
               })
@@ -76,8 +73,30 @@ const actions = {
     imgUpLoad(){
         console.log('点击背景添加图片')
     },
+    delComponent(context, id) {
+        //删除前备份一份
+        // context.commit('setState', { backupComponents: JSON.parse(JSON.stringify(context.state.components)) })
+        // let components = context.state.designComponents
+        // return Promise.resolve(components)
+    },
+    
+
 }
 const mutations = {
+    /**已注册过用户设计页面数据初始化 */
+    initDesignState(state,obj){
+        let keys=Object.keys(state)
+        for(var key of keys){
+            state[key]=obj[key]
+        }
+        console.log('初始化后页设计面的初始信息',state)
+    },
+    setState(state, obj) {
+        // obj = mergeDeep(JSON.parse(JSON.stringify(state)), obj)
+        Object.assign(state, obj)
+
+        //保存本地
+    },
     /** 保存新增的节点信息*/
     addNodes(state,obj){
         console.log('addNodeS被此次调用，传入的参数是',JSON.stringify(obj))
@@ -108,70 +127,6 @@ const mutations = {
         }  
         
     },
-    /**修改节点在页面的位置 */
-    undateNodesPos(state,obj){
-        state.pageTabs[obj.tabId].designComponents[obj.itemId].posx=obj.posx
-        state.pageTabs[obj.tabId].designComponents[obj.itemId].posy=obj.posy
-        console.log('修改节点的位置信息，obj',obj)
-    },
-    /**修改tabi页是否有表格 */
-    updateTable(state,index){
-        if(index!=null){
-            state.pageTabs[index].table.hasSet=true
-        }else{
-            state.pageTabs[index].table.hasSet=false
-        }
-    },
-    /**删除页面节点 */
-    deleteItem(state,obj){
-        console.log('删除元素，传入的obj类型是',typeof obj)
-        if(typeof obj !='object'){
-            if(obj == 'warnBox'){
-                state.layoutInfo.warnBox.hasSet=0
-            }
-        }else{
-            console.log('传入要删除的元素信息是',obj.tabIndex,'id:',obj.id)
-            console.log(state.pageTabs[obj.tabIndex].designComponents[obj.id])
-            state.pageTabs[obj.tabIndex].designComponents.splice(obj.id,1)
-            console.log('删除一个元素后剩余数组',state.pageTabs[obj.tabIndex].designComponents)
-            //修改后面元素的id
-            for(let i=obj.id;i<state.pageTabs[obj.tabIndex].designComponents.length;i++){
-                state.pageTabs[obj.tabIndex].designComponents[i].id=i
-            }
-            //同时，如果后台已注册，需要发送请求到后台同步删除。
-        }
-        
-    },
-    /**还原设计页面数据 */
-    emptyState(state){
-        state.designRoomInfo={'test':{}},
-        state.detialToolsBox={
-            show:0,  
-            rangeType:'',  
-            tabId:null,
-            nodeId:null,
-            itemId:null,  
-            nodeType:null, 
-        } , 
-        state.previewClick=0, 
-        state.layoutInfo={
-            title:'请键入一级标题',
-            subtitle:'请键入二级标题',
-            fireMusic:false,
-            warnBox:{
-                hasSet:0,
-            }
-        },
-        state.pageTabs={
-            0:{
-                name:'默认',
-                imgload:false,
-                designComponents:[],
-                isTable:false
-            }
-        }
-    
-    },
     setRoomInfo(state,obj){
         let roomid=obj.room_id
         console.log('setRoomInfo被此次调用，传入的参数是',JSON.stringify(obj))
@@ -179,6 +134,7 @@ const mutations = {
         state.designRoomInfo[roomid]=Object.assign({},state.designRoomInfo[roomid],obj) 
         console.log('当前'+roomid+'房间里的数据时：',state.designRoomInfo[roomid])
     },
+
     /** 信息配置框是否显示状态修改*/
     showToolsBoxChange(state,obj){
         console.log('传入的store中的detialToolsBox的obj',obj)
@@ -205,14 +161,12 @@ const mutations = {
     updateLayout_tab(state,obj){
         let curLen=Object.keys(state.pageTabs).length
         if(obj.operate =='tab-icon-add'){
+            
             let tabObj={
                 [curLen]:{
                     name:curLen,
                     imgload:false,
-                    designComponents:[],
-                    table:{
-                        hasSet:false
-                    }
+                    designComponents:[]
                 }
             }
             state.pageTabs=Object.assign({},state.pageTabs,tabObj) 
@@ -239,20 +193,10 @@ const mutations = {
     /**
      *与后台数据传输相关 
      */
-    /**初始化页面之前配置信息 */
-    initSavedInfos(state,obj){
-        console.log('接收页面初始化传入的数据是',obj)
-        state.designRoomInfo=obj.designRoomInfo
-        state.layoutInfo=obj.layoutInfo
-        state.pageTabs=obj.pageTabs
-        state.previewClick=obj.previewClick
-    },
     /**接收mqtt传来信息，更新全局存储节点的变量 */
     updateNodesList(state,obj){
-        console.log('designStore接收mqtt数据被调用,数据是obj.tabIndex:',obj.tabIndex,'obj.nodeIndex:',obj.nodeIndex)
-        state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=obj.status
-        console.log('当前要被改变的节点的状态值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].status)
-        
+        console.log('接收，mqtt数据被调用，传入的数据是',obj)
+        // state.pageTabs[obj.tab_id].designComponents=Object.assign({},state.pageTabs[obj.tab_id]) 
     }
 }
 export default {

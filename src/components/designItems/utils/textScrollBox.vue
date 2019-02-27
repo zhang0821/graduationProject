@@ -1,7 +1,7 @@
 <template>
      <div class="marquee">
         <div class="marquee_title">
-            <span>最新战报</span>
+            <span>报警消息</span>
         </div>
         <div class="marquee_box">
             <ul class="marquee_list" :class="{marquee_top:animate}">
@@ -20,36 +20,25 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
     data(){
         return {
             animate: false,
-            marqueeList:[
-                {
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'tem_hum',
-                    tempValue:88,
-                    humiValue:80
-                },
-                {
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'air',
-                    nh4:88,
-                    h2s:80
-                },
-                {
-                    
-                    floor_id: '1',
-                    room_id: '1-1',
-                    type: 'smoke',
-                }
-            ]
         }
     },
     created() {
-        setInterval(this.showMarquee, 2000)
+        setInterval(this.showMarquee, 5000)
+    },
+    computed:{
+        ...mapState('dataTrans',{
+            marqueeList:state=>state.warnInfo
+        })
+    },
+    updated:{
+        marqueeList:(val)=>{
+            console.log('marqueeList值发生改变',val)
+        }
     },
     methods: {
         showMarquee: function () {
@@ -74,8 +63,8 @@ div, ul, li, span, img {
 	width: 100%;
 	height: 50px;
 	align-items: center;
-	color: #3A3A3A;
-	background-color: #b3effe;
+	color: #fff;
+	background-color: #8bb4c0;
 	display: flex;
 	box-sizing: border-box;
 }
@@ -83,9 +72,10 @@ div, ul, li, span, img {
 .marquee_title {
 	padding: 0 20px;
 	height: 30px;
-	font-size: 14px;
+	font-size: 20px;
 	border-right: 1px solid #d8d8d8;
 	align-items: center;
+    color: red;
 }
 
 .marquee_box {

@@ -51,6 +51,7 @@ export default {
         let dataObj=JSON.parse(data)
         if(typeof dataObj == 'object'){
             this.$store.commit('designStore/updateNodesList',dataObj)
+            this.$store.commit('dataTrans/mqttUpdateNodeState',dataObj)
         }
     })
   },

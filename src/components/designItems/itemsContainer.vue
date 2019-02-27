@@ -6,22 +6,22 @@
 
 
         <div class="preview" ref="preview" @dragover="dragOver" @drop="drop" >
-            <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)" v-if="index == curTab" @click="clickPreview" >
-                <nodes-show :infos="tabArr[index].designComponents" ></nodes-show>
+            <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)" v-if="index == curTab" @click="clickPreview"  :style="{backgroundImage: `url(${dynamicImgUrl[index]})`}">
+                <nodes-show v-if="!tabArr[index].table.hasSet" :infos="tabArr[index].designComponents" :design="'design'" ></nodes-show>
+                <table-gener v-else />
             </div>  
-            
             <!-- 是否注册了报警 -->
-            <text-scroll-box v-if="layoutInfo.warnBox"></text-scroll-box>
+            <text-scroll-box v-if="layoutInfo.warnBox.hasSet"></text-scroll-box>
         </div>
-            <!-- 文件上传组件 -->
-            <div v-if="showUploadBox" class="fileUploadBox">
-                <i class="close" @click="finishUpload">x</i>
-                <input type="text" v-model="tabName">
-                <file-upload :file-done="finishUpload" :tabindex="curTab" :type="'img'"></file-upload>
-            </div>
+        <!-- 文件上传组件 -->
+        <div v-if="showUploadBox" class="fileUploadBox">
+            <i class="close" @click="finishUpload">x</i>
+            <input type="text" v-model="tabName">
+            <file-upload :file-done="finishUpload" :tabindex="curTab" :type="'img'"></file-upload>
+        </div>
     </section>
     
-    <section v-else class="designcontainer">
+    <section v-else class="showContainer">
          <ul>
             <li v-for="(tab,index) in Object.keys(tabArr)" :class="{active:index == curTab}" @click="showTab(index)" >
                 <p>{{tabArr[tab].name}}</p>
@@ -30,12 +30,15 @@
         <div class="preview" ref="preview" >
             <!-- :style="{backgroundImage: 'url(' + require("../../../userUpload"+usr+"/"+index+".jpg")+ ')'}"会在编译时打包到dist目录内 -->
             
-            <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)"  v-if="index == curTab && tabArr[index].imgload" :style="{backgroundImage: 'url(' +imgburl+index+'.png)'}" > 
-                <nodes-show :infos="tabArr[index].designComponents" ></nodes-show>
+            <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)"  v-if="index == curTab && tabArr[index].imgload" :style="{backgroundImage: `url(${dynamicImgUrl[index]})`}" > 
+                <nodes-show v-if="!tabArr[index].table.hasSet" :infos="tabArr[index].designComponents" :design="'show'"></nodes-show>
+                <table-gener design="false" v-else />
             </div>
 
             <div  class="preview-area"  v-for="(tab,index) in Object.keys(tabArr)"  v-else-if="index == curTab && !tabArr[index].imgload"  > 
-                <nodes-show :infos="tabArr[index].designComponents" ></nodes-show>
+                <nodes-show v-if="!tabArr[index].table.hasSet" :infos="tabArr[index].designComponents" :design="'show'"></nodes-show>
+                <table-gener design="false" v-else />
+
             </div>   
 
         </div>
@@ -44,6 +47,7 @@
 </template>
 <script>
 import utils from './utils'
+import showItems from '../showItems'
 import { mapState, mapMutations } from 'vuex'
 
 export default {
@@ -51,7 +55,9 @@ export default {
         return {
             /**tab页背景图片地址 */
             imgburl:"/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab",
+            dynamicImgUrl:[],
             showType: '预览',
+            curTab:'0',
             contextmenu: {
                 trigger: null,
                 open: false,
@@ -67,21 +73,33 @@ export default {
             },
             previewMode: 'pc',
             /**tab也切换 */
-            curTab:'0',
             showUploadBox:false,
         }
     },
     props:['operateType'],
     created(){
+       //关于背景图片，如果已经设置了图片，则在初始化时，加载图片
+       Object.keys(this.tabArr).forEach(index=>{
+            console.log('进入图片预览。当前index是',index)           
+           if(this.tabArr[index].imgload){
+               console.log('遍历对象后，此时的index',index)
+               this.dynamicImgUrl[index] ="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+index+'.png?hah=hah'
+            //    this.dynamicImgUrl[index] ="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+index+'.png'
+           }
+           if(this.tabArr[index].table.hasSet){
+               this.dynamicImgUrl[index]=null
+           }
+       })
        
     },
     components:{
-        ...utils
+        ...utils,
+        ...showItems
     },
     computed:{
         ...mapState({
             tabArr:state=>state.designStore.pageTabs,
-            layoutInfo:state=>state.designStore.layoutInfo
+            layoutInfo:state=>state.designStore.layoutInfo,
         }),
         tabName:{
             get:function(){
@@ -90,9 +108,28 @@ export default {
             set:function(value){
                 this.$store.commit('designStore/updateTabName',{'tabIndex':this.curTab,'name':value})
             }
+        },
+        curWarnTab:function(){
+            return this.$store.state.dataTrans.curWarnTab
         }
     },
-    
+    updated(){
+
+    },
+    mounted(){
+        
+    },
+    watch:{
+        curWarnTab(newVal,val){ //普通的监听
+            console.log('curWarnTab监测到变化',newVal)
+        },
+        'tabArr':{//深度监听，可监听到对象、数组的变化
+            handler(val, oldVal){
+                console.log("tabArr"+val);//但是这两个值打印出来却都是一样的
+            },
+            deep:true
+        }
+    },
     methods: {
         getCurPos(e){
             e = e || window.event
@@ -116,6 +153,8 @@ export default {
         },
         ...mapMutations({
             addNode:'designStore/addNodes',
+            updateTable:'designStore/updateTable',
+            undateNodesPos:'designStore/undateNodesPos',
             updateLayoutState:'designStore/updateLayoutState'
 
         }),
@@ -131,17 +170,28 @@ export default {
             if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                 return
             if(info.compType == 'node' ){
-                if(Object.keys(this.tabArr).length < 0){
+                if(Object.keys(this.tabArr).length < 0 || this.tabArr[this.curTab].table.hasSet){//或者当前为表格页
                     return
                 }
-                let storeNode={
-                    tabIndex:this.curTab
-                }
                 let mouse=this.getCurPos(e)
-                Object.assign(storeNode,mouse,info)
-                console.log('存储元素',storeNode)
-                this.addNode(storeNode)
+                if(info.changePos){
+                     Object.assign(info,mouse)
+                    this.undateNodesPos(info)
+                }else{
+                    let storeNode={
+                        tabIndex:this.curTab
+                    }
+                    Object.assign(storeNode,mouse,info)
+                    console.log('存储元素',storeNode)
+                    this.addNode(storeNode)
+                }
+                
             }else{
+                if(info.type == 'table'){
+                    console.log('进入增加table到当前页')
+                    this.updateTable(this.curTab)
+                    return
+                }
                 let storeLayout={
                     [info.type]:{
                         hasSet:1
@@ -156,10 +206,7 @@ export default {
             e.preventDefault()
         },
         showTab(tab){
-            this.curTab=tab
-            // 并请求背景图片并
-            // this.$refs.preview.style.backgroundColor="rgb(" + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ',' + Math.round(Math.random() * 10) + ')'
-            
+            this.curTab=tab  
         },
         /**双击添加背景图片 */
         fileLoad(tabIndex){
@@ -170,13 +217,16 @@ export default {
         finishUpload(){
             console.log('文件传输完成，关闭文件传输框')
             this.showUploadBox=false
+            //并加载当前tab页背景图为刚才上传的背景图
+            this.dynamicImgUrl[this.curTab]="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+this.curTab+".png?date="+(new Date()).getTime()
+            this.$forceUpdate()
         }
     },
 }
 </script>
 
 <style lang="scss" scoped>
-.designcontainer{
+.showContainer,.designcontainer{
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -210,7 +260,7 @@ export default {
         .preview-area{
             flex: 1;
             border:2px solid #fff;
-            background-color: #ccc;
+            background-color: #000;
             background-repeat: no-repeat;
             // background-image: url(../../../userUpload/zhang/bgImgOftab0.jpg);
             background-size: 100% 100%;

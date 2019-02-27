@@ -31,16 +31,15 @@
                 <li @click="layoutTab">
                     <span>减少tab页</span><i class="tab-icon-del">-</i>
                 </li>
-
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="layout" data-name='warnBox'>报警框</div>
-                </li>
                 
             </ul>
 
             <ul class="components-list common" v-if="this.UItype==='通用组件'">
                 <li>
                     <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='warnBox'>报警框</div>
+                </li> 
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='table'>数据表格</div>
                 </li> 
             </ul>
         </div>
@@ -72,7 +71,6 @@ export default {
                 width:e.target.offsetWidth,
                 height:e.target.offsetHeight,
             }
-            
             e.dataTransfer.setData('info', JSON.stringify(info))
         },
 

@@ -96,6 +96,7 @@ var fsOperateFuncs={
 }
 
 function fileDisplay(filePath,dstDir){
+
     copyFolder(filePath,dstDir)
     //根据文件路径读取文件，返回文件列表
 //     fs.readdir(filePath,function(err,files){

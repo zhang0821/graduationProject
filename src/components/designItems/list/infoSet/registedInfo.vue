@@ -46,9 +46,6 @@ export default {
     },
     components:{
     },
-    mapState:{
-
-    },
     watch:{
         'registedInfos':(val,oldVal)=>{
             console.log('registedInfos数据变化','之前是',Object.keys(oldVal),'现在是',Object.keys(val))
@@ -70,7 +67,6 @@ export default {
                 this.errorText='填写信息不全'
                 return 
             }
-            
             this.$emit('child-info-save','room',this.roomId,this.registedInfos[this.roomId])
             this.showDetiaSetBox=0;
         },

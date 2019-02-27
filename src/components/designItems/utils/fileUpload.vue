@@ -115,7 +115,7 @@ export default {
           console.log('即将关闭对话框')
           setTimeout(() => {
             this.fileDone()              
-          }, 3000);
+          }, 1000);
       }
     }
 }

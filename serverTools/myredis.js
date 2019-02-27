@@ -49,6 +49,11 @@ let redisObj={
             console.error('list测试的输出err,',error);
         }
      },
+     //删除节点
+     async  updateNodeInfo(key,info){
+           await redisClient.hdel('NODE',key)
+           redisClient.hset('NODE',key,JSON.stringify(info))
+     },
     //用户查询
     usrSearch(usr){
         return new Promise((resolve,reject)=>{
@@ -57,10 +62,27 @@ let redisObj={
                 if(res){
                     resultObj=JSON.parse(res)
                     console.log('usrSearch返回的数据参数',resultObj)
-                    resolve(resultObj.area)
+                    resolve(resultObj)
                 }else{
                     reject(err)
                 }
+            })
+        })
+    },
+    //新增用户
+    saveUsr(usr,info){
+        return new Promise((resolve,reject)=>{
+            redisClient.hget('USER',usr,(err,res)=>{
+                if(err){
+                    reject(err)
+                }
+                if(res){
+                    resolve(false) //该用户已经存在
+                }else{
+                    redisClient.hset('USER',usr,info)
+                    resolve(true)
+                }
+                
             })
         })
     },
@@ -137,6 +159,32 @@ let redisObj={
             })
         })
          
+    },
+    //保存新增的节点
+    saveNodes(key,info){
+        return new Promise((resolve,reject)=>{
+            redisClient.hget('NODE',key,(err,res)=>{
+                if(err){
+                    reject(err)
+                }
+                if(res){
+                    let resInfo = JSON.parse(res)
+                    console.log('当前找到的节点信息是',resInfo)
+                    if(info.area == resInfo.area){
+                        console.log('修改当前节点信息')
+                        this.updateNodeInfo(key,info)
+                        resolve(true)
+                    }else{
+                        resolve(false) //该节点已经存在
+                    }
+                    
+                }else{
+                    redisClient.hset('NODE',key,JSON.stringify(info))
+                    resolve(true)
+                }
+                
+            })
+        })
     }
 }
 

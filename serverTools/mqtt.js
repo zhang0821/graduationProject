@@ -4,6 +4,7 @@
 const mqtt = require('mqtt')
 const myredis=require('./myredis')
 const socket=require('./socket')
+const email=require('./message')
 const sockEvent=socket.socketEvent
 
 // const mqttClient = mqtt.connect('mqtt://10.149.65.47:1883')
@@ -12,7 +13,8 @@ const mqttClient = mqtt.connect('mqtt://10.149.65.47:1883')
 
 mqttClient.on('connect', function () {
 	console.log('成功连接mqtt服务器');
-	mqttClient.subscribe('loraPub',{qos:2})
+    mqttClient.subscribe('loraPub',{qos:2})
+    // email.sendMail('839829400@qq.com', 'subject', 'html')
 });
 
 mqttClient.on('message', function (topic, message) {

@@ -4,10 +4,10 @@
         <div class="header">
     
             <div class="title">
-                <h1>{{designStore.layoutInfo.title}}</h1>
+                <h1 ref="h1">{{designStore.layoutInfo.title}}</h1>
                 <h4>{{designStore.layoutInfo.subtitle}}</h4>
             </div>
-        	<audio v-if="designStore.layoutInfo.fireMusic" :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" controls="controls"  id="music"  loop="loop" hidden="hidden"  preload="auto">
+        	<audio v-if="designStore.layoutInfo.fireMusic && myaudio!=null"  hidden :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" ref="audioRef" controls="controls"  id="music"  loop="loop"   preload="auto">
             </audio>
         </div>
         <div class="designCon">
@@ -17,9 +17,8 @@
             <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
         </div>
           
-        <div class="warnScroll">
+        <div class="warnScroll" v-if="designStore.layoutInfo.warnBox.hasSet">
             <text-scroll-box></text-scroll-box>
-
         </div>
       <div @click="goDesign" class="goDesign">design</div>
       <final-mqtt :username="usr"></final-mqtt>
@@ -36,8 +35,9 @@ import { mapState, mapActions, mapMutations } from 'vuex';
         name: 'Design',
         data() {
             return {
-                usr:this.$store.state.dataTrans.username,
+                usr:null,
                 isLoging:0,
+                designStore:null
             }
         },
         components:{
@@ -50,31 +50,60 @@ import { mapState, mapActions, mapMutations } from 'vuex';
           if(this.$route.params.usr){
             this.usr=this.$route.params.usr
           }else{
-            this.usr=this.$store.state.dataTrans.username
+            this.$router.push({
+                name:'Login'
+            })
           }
+          this.designStore=this.$route.params.info
+          this.$store.commit('designStore/initSavedInfos',this.designStore)
         },
         computed:{
             ...mapState({
-                designStore:state=>state.designStore,
+                myaudio:state=>state.dataTrans.audio,
             }),    
             
+        },
+        updated(){
+            if(this.myaudio != null){
+                this.$refs.audioRef.play()
+            }
+            console.log('main页面update,当前myaudio值',this.myaudio) //只要页面数据更新造成页面重新渲染，就会被调用
         },
         methods: {          
             ...mapActions({
             }),
             ...mapMutations({
-                
+                // bindAudioRefs:'dataTrans/audioRefs'
             }),
             goDesign(){
               this.$router.push({
                   name:'Design',
                   params:{
-                      usr:this.$store.state.dataTrans.username
+                      usr:this.usr
                   }
               })
             }
    
         },
+        mounted(){//页面渲染完成后，才能获取refs绑定到的元素,只调用一次
+            console.log('main页面mounted')
+            if(this.designStore.layoutInfo.fireMusic && this.myaudio!=null){
+                this.$refs.audioRef.play()
+            }
+        },
+         watch:{
+            usr:(newUsr)=>{
+                console.log('主页面usr发生变化，src资源地质变化',newUsr)
+            },
+            // myaudio:(val,newVal)=>{
+            //         console.log(val,'全局触发报警铃声',newVal)
+            //     // console.log('全局触发报警铃声',newVal)
+            //     // if(this.designStore.layoutInfo.fireMusic && newVal!=null){
+            //     //     this.$refs.audioRef.play()
+            //     //     // this.bindAudioRefs(this.$refs.audioRef)
+            //     // }
+            // }
+        }
     }
 </script>
 <style lang="scss">

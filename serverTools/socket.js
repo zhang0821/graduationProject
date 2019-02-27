@@ -51,7 +51,8 @@ let socketEvent={
   authenLogin(usr){
     return new Promise((resolve,reject)=>{
       redis.usrSearch(usr).then((data)=>{
-        console.log('socket操作redis后返回的数据',data)
+        console.log('socket操作redis后返回的数据',data.area)
+        data=data.area
         if(data){
           console.log('用户所属的房间',data)
           resolve(data)
@@ -69,6 +70,7 @@ let socketEvent={
     if(nameSpace != undefined){
       let exist=0
       for(var clinet in WSClients){
+        roomname=roomname.area
         console.log('clinet',WSClients[clinet],'roomname',roomname)
         if(WSClients[clinet] == roomname){
           exist=1
