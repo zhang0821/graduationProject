@@ -47,7 +47,7 @@
             </div>
             
             <div v-if="registSuccess">
-                <div  class="registSuccess">注册成功</div>
+                <div  class="registSuccess">注册成功了！</div>
                 <!-- <a href="javascript:;" class="reg-btn goDesign" @click="goDesign">进入配置页面</a> -->
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
