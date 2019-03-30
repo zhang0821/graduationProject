@@ -1,27 +1,29 @@
 <template>
-    <div class="tableShow">
-        <div v-if="design">
-            <i class="addCol" @click="addCol">增加列</i>
-        </div>
-       
-        <table>
-            <caption v-if="design"><input type="text" v-model="basicInfo.title" placeholder="表格标题"></caption>
-            <caption v-else>{{basicInfo.title}}</caption>
+        <div class="tableShow">
+            <div v-if="design">
+                <i class="addCol" @click="addCol">增加列</i>
+            </div>
+        
+            <table>
+                <caption v-if="design"><input type="text" v-model="basicInfo.title" placeholder="表格标题"></caption>
+                <caption v-else>{{basicInfo.title}}</caption>
 
-            <tr class="tableTr">
-                <th v-for="(col,index) in columList" :class="index == (columList.length-1) ?'addBtn' :''">
-                    <input type="text" v-if="design" v-model="col.name" placeholder="输入列名称">
-                    <i v-else>{{col.name}}</i>
-                </th>
-                <th v-if="design && columList.length>2" class="delCol" @click="delCol"></th>
-            <tr>
-            <tbody v-if="!design">
-                <tr v-for='(data,index) in dataInfo'>
-                    <td v-for="key in Object.keys(data)">{{key}}:{{data[key]}}({{columList[index].unit}})</td>
+
+                <tr class="tableTr">
+                    <th v-for="(col,index) in columList" :class="index == (columList.length-1) ?'addBtn' :''">
+                        <input type="text" v-if="design" v-model="col.name" placeholder="输入列名称">
+                        <i v-else>{{col.name}}</i>
+                    </th>
+                    <th v-if="design && columList.length>2" class="delCol" @click="delCol"></th>
                 </tr>
-            </tbody>
-        </table>
-    </div>
+                    
+                <tbody v-if="!design">
+                    <tr v-for='(data,index) in dataInfo'>
+                        <td v-for="key in Object.keys(data)">{{key}}:{{data[key]}}({{columList[index].unit}})</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 </template>
 <script>
 export default {

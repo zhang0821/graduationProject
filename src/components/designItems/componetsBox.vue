@@ -41,6 +41,9 @@
                 <li>
                     <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='table'>数据表格</div>
                 </li> 
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='box'>文本框</div>
+                </li>
             </ul>
         </div>
     </section>
@@ -106,13 +109,13 @@ export default {
 </script>
 <style lang="less" scoped>
 section{
-    color:#fff;
+    color:#16A085;
 }
 
 .UItypeS{
     width: 100%;
     padding: 5px 0;
-    background: #ccc;
+    background: #BDC3C7;
     border-bottom: 1px solid #fff;
     text-align: center;
     &:hover{
@@ -160,13 +163,13 @@ section{
             display: block;
             padding:0 2px;
             text-align: center;
-            border-bottom:1px solid #fff;
+            border-bottom:1px solid #ccc;
         }
         i{
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 1px solid #fff;
+            border: 1px solid #ccc;
             border-radius: 50% 50%;
             margin-right: 10px;
             line-height: 20px;

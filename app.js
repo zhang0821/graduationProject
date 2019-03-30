@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 app.use(express.static('dist'));
 
 
+
 app.use('/', require("./routes/users")); //主路由
 app.use('/config', require("./routes/saveConfig")); //组态页面设计路由
 app.use('/pageInit',require("./routes/pageInit"));//初始数据获取

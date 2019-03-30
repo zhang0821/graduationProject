@@ -28,7 +28,7 @@ export default {
         }
     },
     created() {
-        setInterval(this.showMarquee, 5000)
+        // setInterval(this.showMarquee, 5000)
     },
     computed:{
         ...mapState('dataTrans',{

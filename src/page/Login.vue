@@ -86,9 +86,20 @@ export default {
     Loading
   },
   created() {
-      this.account='test'
-      this.password="123456"
-    //   this.goDesign()
+      this.goDesign()
+   
+   
+//    //发起请求，获取公钥私钥。
+//     this.$http.post('/sysInit').then((response) => {
+//         let keyInfo=response.data
+//         //使用sessionStorage存储，
+//         if(keyInfo){
+//             console.log('获取到的公钥是',keyInfo)
+//             sessionStorage.setItem("pKey",keyInfo)
+//         }
+//     }).catch(err=>{
+//         console.log('出错',err)        
+//     }) 
   },
   methods:{
 
@@ -100,18 +111,40 @@ export default {
       },
       /**登录请求 */
   	toLogin(){
+        
+        let pKey=sessionStorage.getItem("pKey")
+
+        let acc=this.$encrtptData(this.account,pKey)
+        let pwd=this.$encrtptData(this.password,pKey)
+        console.log('加密后的用户名是：',acc,"和密码：",pwd)
   		let loginParam = {
-  			login_username: this.account,
-  			login_password:this.password
+              //加密两个字段
+  			login_username: acc,
+  			login_password: pwd
   		}
 
         this.isLoging = true;
   		//请求后端,比如:
   		this.$http.post('/login', {loginParam}).then((response) => {
           
-              console.log('登录页面返回数据信息',response)
+                //登录成功后，response.data.data是加密的，同时需要返回专属于该用户的加密字段
+
+                // let privateKey=response.data.key
+
+                // let detialInfostr=response.data.encryptData//是加密后的
+
+                // let infoStr=this.$decrtptData(detialInfostr,privateKey)
+                // console.log('解密后的字符串是',infoStr)
+
+                // response.data = JSON.parse(infoStr)
+                // console.log('解密后的对象信息是',response.data)
+
+
+
               if(response.data.state == "3"){ //转到设计页面
               console.log('跳转进入设计页面,返回携带的数据信息是',response.data.data)
+                //登录成功后，response.data.data是加密的，同时需要返回专属于该用户的加密字段
+
                 this.$router.push({
                         name:'Design',
                         params:{

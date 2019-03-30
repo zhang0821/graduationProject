@@ -34,7 +34,8 @@ const actions = {
               })
           })
 
-    }
+    },
+    
 }
 const mutations = {
     mqttUpdateNodeState(state,obj){

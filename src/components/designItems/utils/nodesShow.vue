@@ -143,6 +143,7 @@ export default {
                 height:e.target.offsetHeight,
 
             } 
+            console.log('节点的再次拖拽事件')
             e.dataTransfer.setData('info', JSON.stringify(info))
         },
         /**右键菜单 */

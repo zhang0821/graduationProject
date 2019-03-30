@@ -89,9 +89,9 @@ export default {
     text-align: center;
     margin-top: 10px;
     width: 100%;
-    color:#fff;
+    color:#16A085;
     h4{
-        border-bottom: 1px solid #fff;
+        border-bottom: 1px solid #16A085;
     }
     .roomBox{
         display: flex;
@@ -101,14 +101,14 @@ export default {
         .room-btn{
             display: inline-block;
             padding: 2px 10px;
-            border: 1px solid #fff;
+            border: 1px solid #16A085;
             border-radius: 5px;
             &:hover{
                 cursor: pointer;
             }
             &.hasSetted{
-                background:#fff;
-                color:#000;
+                background:#16A085;
+                color:#fff;
             }
         }
     }
@@ -116,10 +116,10 @@ export default {
     .roomConfig{
         width: 100%;
         height: auto;
-        color: #000;
+        color: #16A085;
         margin-top: 10px;
         padding:10px;
-        border: 1px solid #fff;
+        border: 1px solid #16A085;
         li{
             display: flex;
             justify-content: space-around;
@@ -137,12 +137,12 @@ export default {
             }
         }
         p{
-            color: red;
+            color: #16A085;
             padding: 5px;
             text-align: center;
         }
         &.error li input{
-            border:1px soild red;
+            border:1px soild #16A085;
         }
     }
     .btn-save{
@@ -151,7 +151,7 @@ export default {
         width: 8em;
         padding: 10px 20px;
         border-radius: 20px;
-        border:1px solid #fff;
+        border:1px solid #16A085;
         &:hover{
             cursor: pointer;
         }

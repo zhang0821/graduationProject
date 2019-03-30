@@ -91,10 +91,10 @@ export default {
     display: flex;
     flex-direction: column;
     h4{
-        color: #fff;
+        color: #16A085;
         text-align: center;
         padding-bottom: 5px;
-        border-bottom: 1px solid #fff;
+        border-bottom: 1px solid #16A085;
     }
     .paraConfig{
         width: 100%;
@@ -114,12 +114,12 @@ export default {
             }
         }
         p{
-            color: red;
+            color: #16A085;
             padding: 5px;
             text-align: center;
         }
         &.error li input{
-            border:1px soild red;
+            border:1px soild #16A085;
         }
     }
     .btn-save{
@@ -128,7 +128,8 @@ export default {
         width: 8em;
         padding: 10px 20px;
         border-radius: 20px;
-        background: #fff;
+        background: #16A085;
+        color:#fff;
         &:hover{
             cursor: pointer;
         }

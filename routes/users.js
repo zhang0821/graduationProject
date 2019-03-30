@@ -5,6 +5,24 @@ let path=require('path')
 var fs=require('fs')
 var redis=require('../serverTools/myredis')
 
+var rsa=require('../serverTools/rsa')
+
+var serverRSA= new rsa.RSAserver()
+const serverPublicKey = serverRSA.getPublicKey()  //发送给客户端，让其对数据进行加密
+const serverPrivateKey = serverRSA.getPrivateKey() //解密客户端加密数据
+
+router.post("/sysInit",(req,res,next)=>{
+    // let myRSA =new rsa.RSAclient()
+    // let private=myRSA.getPrivateKey()
+    res.send(serverPublicKey) //将服务器端统一的公钥发送给客户端
+});
+
+/**保存每个客户端的公私钥信息 */
+let userKey={
+  
+}
+
+
 //用户名校验
 function authenticate(userName, pwd){
   return new Promise((resolve,reject)=>{
@@ -44,8 +62,13 @@ router.requireAuthentication = function(req, res, next){
 
 
 router.post('/login', function(req, res, next){
-  var userName = req.body.loginParam.login_username;
-  var pwd = req.body.loginParam.login_password;
+  console.log('userKey存储信息是',userKey)
+
+  var userName = serverRSA.decryptData(req.body.loginParam.login_username)
+  var pwd = serverRSA.decryptData(req.body.loginParam.login_password)
+  
+  // var userName = req.body.loginParam.login_username;
+  // var pwd = req.body.loginParam.login_password;
 
   console.log("login_username - " + userName + " password - " + pwd );
   authenticate(userName, pwd).then(info=>{
@@ -67,6 +90,28 @@ router.post('/login', function(req, res, next){
     }else if(info == 1){
       returnData.state="0"
     }
+
+    //查询该用户名下是否生成过公私钥对，获取公钥，对returnData数据进行加密，再发送，同时，把它的私钥传给他
+    console.log('当前用户下是否有公私钥',userKey[userName])
+    let final = null
+    if(!userKey[userName]){
+      let rsaKEY=new rsa.RSAclient()
+      userKey[userName]=rsaKEY
+      console.log('当前用户公私钥 信息是',userKey)
+      final={
+        key:rsaKEY.getPrivateKey(),
+        encryptData:rsaKEY.encryptData(JSON.stringify(returnData))
+      }
+      console.log('加密序列化后的数据是：',rsaKEY.encryptData(JSON.stringify(returnData)))
+    }else{
+      let rsaKEY=userKey[userName]
+      
+      final={
+        key:rsaKEY.getPrivateKey(),
+        encryptData:rsaKEY.encryptData(JSON.stringify({"0":111}))
+      }
+    }
+    
     res.json(returnData)
   }).catch(data=>{
     console.log('登录函数进入catch,返回数据',data)

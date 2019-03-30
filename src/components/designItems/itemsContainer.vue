@@ -11,7 +11,10 @@
                 <table-gener v-else />
             </div>  
             <!-- 是否注册了报警 -->
-            <text-scroll-box v-if="layoutInfo.warnBox.hasSet"></text-scroll-box>
+            <text-scroll-box v-if="layoutInfo.warnBox.hasSet"  draggable="true" @dragstart="dragStart" >
+
+            </text-scroll-box>
+            <text-box />
         </div>
         <!-- 文件上传组件 -->
         <div v-if="showUploadBox" class="fileUploadBox">
@@ -158,6 +161,19 @@ export default {
             updateLayoutState:'designStore/updateLayoutState'
 
         }),
+        dragStart(e){
+            let info = {
+                compType:'common',
+                type:'warnBox',
+                changePos:true,
+
+                width:e.target.offsetWidth,
+                height:e.target.offsetHeight,
+
+            } 
+            console.log('报警框再次拖拽事件')
+            e.dataTransfer.setData('info', JSON.stringify(info))
+        },
         dragOver(e) {
             console.log('dragOver函数进入')
             e.preventDefault()
@@ -257,10 +273,11 @@ export default {
         flex: 1;
         display: flex;
         flex-direction: column;
+        border-top: 1px solid #D35400;
         .preview-area{
             flex: 1;
-            border:2px solid #fff;
-            background-color: #000;
+            // border:3px solid #fff;
+            background-color: transparent;
             background-repeat: no-repeat;
             // background-image: url(../../../userUpload/zhang/bgImgOftab0.jpg);
             background-size: 100% 100%;
@@ -275,7 +292,7 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    border: 2px solid #000;
+    border: 2px solid #D35400;
     .close{
         display: block;
         width: 18px;

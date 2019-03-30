@@ -76,6 +76,8 @@ const actions = {
     imgUpLoad(){
         console.log('点击背景添加图片')
     },
+    //公用的dragstart函数
+    
 }
 const mutations = {
     /** 保存新增的节点信息*/
