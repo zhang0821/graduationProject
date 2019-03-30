@@ -9,7 +9,7 @@ const state = {
     // designComponents:[], //放置在绘图区域内的组件信息,包括edv_eui,roomis,floor_id,posx,poy
 
     /**存储配置的房间信息 */
-    designRoomInfo:{'test':{}},  //  保存配置各个房间的信息，tem_high,...,以floor-room作为键值,在infoSetBox组件中被调用传参到registedInfo组件
+    designRoomInfo:{},  //  保存配置各个房间的信息，tem_high,...,以floor-room作为键值,在infoSetBox组件中被调用传参到registedInfo组件
 
     // backupComponents:[],// 用于“上一步”，下一步的中转变量存储
    
@@ -30,9 +30,9 @@ const state = {
         title:'请键入一级标题',
         subtitle:'请键入二级标题',
         fireMusic:false,
-        warnBox:{
-            hasSet:0,
-        }
+        // warnBox:{
+        //     hasSet:0,
+        // }
     },
     /**保存每个页面节点信息 */
     pageTabs:{
@@ -129,7 +129,8 @@ const mutations = {
         console.log('删除元素，传入的obj类型是',typeof obj)
         if(typeof obj !='object'){
             if(obj == 'warnBox'){
-                state.layoutInfo.warnBox.hasSet=0
+                delete state.layoutInfo.warnBox
+                // state.layoutInfo.warnBox.hasSet=0
             }
         }else{
             console.log('传入要删除的元素信息是',obj.tabIndex,'id:',obj.id)
@@ -160,9 +161,9 @@ const mutations = {
             title:'请键入一级标题',
             subtitle:'请键入二级标题',
             fireMusic:false,
-            warnBox:{
-                hasSet:0,
-            }
+            // warnBox:{
+            //     hasSet:0,
+            // }
         },
         state.pageTabs={
             0:{
@@ -226,7 +227,7 @@ const mutations = {
             console.log('删除属性后，当前pageTabs是',JSON.stringify(state.pageTabs))
         }
     },
-    /**上传文件后修改layout属性状态 */
+    /**通用组件保存及资源上传 */
     updateLayoutState(state,obj){
         console.log('上传文件好偶更新layout状态，上传的obj是',obj)
         if(obj.type == 'img'){
@@ -235,6 +236,7 @@ const mutations = {
             state.layoutInfo.fireMusic=obj.val
         }else{
             state.layoutInfo=Object.assign({},state.layoutInfo,obj)
+            console.log('当前layoutInfo值为',state.layoutInfo)
         }
     },
 

@@ -11,10 +11,10 @@
                 <table-gener v-else />
             </div>  
             <!-- 是否注册了报警 -->
-            <text-scroll-box v-if="layoutInfo.warnBox.hasSet"  draggable="true" @dragstart="dragStart" >
+            <text-scroll-box v-if="layoutInfo.warnBox"  draggable="true" @dragstart="dragStart" >
 
             </text-scroll-box>
-            <text-box />
+            
         </div>
         <!-- 文件上传组件 -->
         <div v-if="showUploadBox" class="fileUploadBox">

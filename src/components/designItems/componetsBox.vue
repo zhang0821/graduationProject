@@ -42,7 +42,7 @@
                     <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='table'>数据表格</div>
                 </li> 
                 <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='box'>文本框</div>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='textBox'>文本框</div>
                 </li>
             </ul>
         </div>
@@ -73,6 +73,8 @@ export default {
                 type: componentName,
                 width:e.target.offsetWidth,
                 height:e.target.offsetHeight,
+                top:0,
+                left:0
             }
             e.dataTransfer.setData('info', JSON.stringify(info))
         },

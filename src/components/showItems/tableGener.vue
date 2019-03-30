@@ -39,7 +39,7 @@ export default {
             default:true
         },
         columList:{
-            type:Object,
+            type:Array,
             default:function(){
                 return [
                     {
@@ -51,7 +51,7 @@ export default {
             }
         },
         dataInfo:{
-            type:Object,
+            type:Array,
             default:function(){
                 return [
                     {
@@ -94,33 +94,48 @@ export default {
 
 <style lang="scss" scoped>
 .tableShow{
+    width:auto;
+    overflow:scroll;
     width: 100%;
-    height: 100%;
-    border: 1px solid #fff;
+    height: auto;
+    max-height: 100%;
+    border: 1px solid #000;
     .addCol{
         display: inline-block;
+        margin-left: 50%;
         padding: 5px 10px;
-        color: #fff;
+        color: #000;
         cursor: pointer;
     }
     table{
         width: 100%;
         text-align: center;
-        color: #fff;
+        color: #000;
         background: #699;
         border-collapse: collapse;
-        border: 1px solid #fff;
+        border: 1px solid #000;
         caption{
             text-align: center;
+        }
+        th,td{
+            // float: left;
+            // width: 80px;
+            padding: 5px 0;
+            input{
+                width: 80px;
+            }
+             &.delCol{
+                 margin: 5px;
+                width: 20px;
+                height: 20px;
+             }
         }
     }
     .tableTr{
         width: 100%;
         height: 30px;
-        background: #ccc;
         display: flex;
         th{
-            flex: 1;
             text-align: center;
             &.delCol{
                 width: 20px;

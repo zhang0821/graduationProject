@@ -33,15 +33,15 @@
                 <!-- myComponents 使用ref属性后的元素，该元素则可以通过 this.$refs.myComponents 被作为DOM元素引用-->
             </div>
             <div class="designCon">
-                <div class="basicInfo">
-                    <div @click="showMediaUpload">点击重新添加告警音乐</div>
-                    <!-- <img :src="require('../../userUpload/'+usr+'/bgImgOftab0.png')" alt="测试动态路径图片"> -->
+                <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
+                    <text-box v-if="designStore.layoutInfo.textBox" v-location="designStore.layoutInfo.textBox"/>
+                    <!-- <div @click="showMediaUpload">点击重新添加告警音乐</div>
                     <div>
                         <input type="text" v-model="title"/>
                     </div>
                     <div>
                         <input type="text" v-model="subtitle" />                   
-                    </div>
+                    </div> -->
                 </div>
                 <div class="nodePosInfo">
                     <componets-con :operate-type="'design'"></componets-con>
@@ -125,7 +125,8 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             ...mapMutations([
                 'updateTitle',
                 'emptyState',
-                'deleteItem'
+                'deleteItem',
+                'updateLayoutState'
             ]),
             showMediaUpload(){
                 this.mediaUpload=true
@@ -136,6 +137,21 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 console.log('showUploadBox当前状态值',this.mediaUpload)
 
             },
+            /**通用控件放置处 */
+            layoutDrop(e){
+                let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
+                if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
+                    return
+                console.log('目前放置到通用组件位置的元素是',info)  
+                let storeLayout={
+                    [info.type]:{
+                        hasSet:1
+                    }
+                }
+                Object.assign(storeLayout[info.type],info)
+                this.updateLayoutState(storeLayout)
+
+            },
             /**回收站*/
             
             dragover(e){
@@ -143,56 +159,25 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                  event.preventDefault() //必须阻止某一 DOM 元素对 dragover 的默认行为，才能使 drop 事件在其上正确执行：
             },
             removeIt(e){
-            console.log("info具体信息",e.dataTransfer.getData('info'))
-            
-            let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
-            
-            if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
-                return
-            
-            console.log('当前要移除的元素是：',info)
-            if(info.compType == "node"){ //移除到回收站的是节点
-                let delInfo={
-                    tabIndex:info.tabId,
-                    id:info.itemId
-                }
-                this.deleteItem(delInfo)
-            }
-            if(info.compType == "common"){ //移除通用组件
-                 this.deleteItem(info.type)
-            }
-            
-            // if(info.compType == 'node' ){
-            //     if(Object.keys(this.tabArr).length < 0 || this.tabArr[this.curTab].table.hasSet){//或者当前为表格页
-            //         return
-            //     }
-            //     let mouse=this.getCurPos(e)
-            //     if(info.changePos){
-            //          Object.assign(info,mouse)
-            //         this.undateNodesPos(info)
-            //     }else{
-            //         let storeNode={
-            //             tabIndex:this.curTab
-            //         }
-            //         Object.assign(storeNode,mouse,info)
-            //         console.log('存储元素',storeNode)
-            //         this.addNode(storeNode)
-            //     }
+                console.log("info具体信息",e.dataTransfer.getData('info'))
                 
-            // }else{
-            //     if(info.type == 'table'){
-            //         console.log('进入增加table到当前页')
-            //         this.updateTable(this.curTab)
-            //         return
-            //     }
-            //     let storeLayout={
-            //         [info.type]:{
-            //             hasSet:1
-            //         }
-            //     }
-            //     Object.assign(storeLayout[info.type],info)
-            //     this.updateLayoutState(storeLayout)
-            // }
+                let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
+                
+                if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
+                    return
+                
+                console.log('当前要移除的元素是：',info)
+                if(info.compType == "node"){ //移除到回收站的是节点
+                    let delInfo={
+                        tabIndex:info.tabId,
+                        id:info.itemId
+                    }
+                    this.deleteItem(delInfo)
+                }
+                if(info.compType == "common"){ //移除通用组件
+                    this.deleteItem(info.type)
+                }
+            
             },
             draw() {
             },
@@ -300,7 +285,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             // background:rgb(139 , 180, 192);
             display: flex;
             flex-direction: column;
-            .basicInfo{
+            .layoutInfo{
                 width: 100%;
                 height: auto;
                 min-height: 100px;

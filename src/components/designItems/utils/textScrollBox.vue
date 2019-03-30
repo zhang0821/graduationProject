@@ -1,5 +1,5 @@
 <template>
-     <div class="marquee">
+     <div class="marquee" v-resizable>
         <div class="marquee_title">
             <span>报警消息</span>
         </div>
