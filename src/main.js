@@ -6,7 +6,8 @@ import App from './App'
 import router from './router'
 import store from './store/index'
 import VueResource from 'vue-resource'
-import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/css/bootstrap.css' //第三方样式插件引入
+
 import 'vue-contextmenu/style/css/font-awesome.min.css'
 import 'bootstrap/dist/js/bootstrap.js'
 import { JSEncrypt } from 'jsencrypt' //RSA加密
