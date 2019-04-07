@@ -1,5 +1,5 @@
 <template>
-    <div class="drawBoard"> 
+    <div class="drawBoard" ref="drawBoard"> 
         <!-- 全屏画布 -->
         <canvas id="canvas" ref="canvas"></canvas>
         <!-- 功能菜单 -->
@@ -36,7 +36,7 @@
         <!-- 颜色画笔选择侧边栏 -->
         <div id="sidebar" ref="sidebar">
             <div class="sidebar-draw" ref="sidebarDraw">
-                <h2>画笔</h2>
+                <!-- <h2>画笔</h2> -->
                 <ul>
                     <li>
                         <span></span>
@@ -59,7 +59,7 @@
                 </ul>
             </div>
             <div class="sidebar-color" ref="sidebarColor">
-                <h2>颜色</h2>
+                <!-- <h2>颜色</h2> -->
                 <ul>
                     <li></li>
                     <li></li>				
@@ -108,10 +108,8 @@ export default {
     name: 'drawBorad',
     data(){
         return{
-            gloaObj: {
-
-                W: document.documentElement.clientWidth,
-                H: document.documentElement.clientHeight,
+                W: null,
+                H: null,
                 CTX: null,
                 DATA: [],	//储存绘制数据
                 COLOR: '#f00056',
@@ -120,15 +118,19 @@ export default {
                 ERAS: 0,
                 TIMER: null,
                 downObj:null
-            },
         }
     },
     created(){
-        //2s后隐藏开屏界面，初始化画板
-        let firstScreen = this.$refs.firstScreen
+       
+    },
+    mounted(){
+         //2s后隐藏开屏界面，初始化画板
+        let firstScreen = this.$refs.firstScreen //要在元素渲染完成后才能取到
+        this.W=this.$refs.drawBoard.clientWidth
+        this.H=this.$refs.drawBoard.clientHeight
         setTimeout(() =>{
-            firstScreen.style.display = 'none';
             this.init();
+            firstScreen.style.display = 'none';
         },3000);
     },
     methods:{
@@ -140,99 +142,105 @@ export default {
             //菜单功能选择
             this.menuOption();
             //颜色选择
-            // this.selectColor();
+            this.selectColor();
             //粗细选择
-            // this.selectLine();
+            this.selectLine();
             //自定义菜单
             this.customMenu();
         },
         //菜单功能选择
-  menuOption () {
+        menuOption () {
 
-    var menu = this.$refs.menu
+            var menu = this.$refs.menu
 
-    var item = menu.getElementsByTagName('li');
+            var item = menu.getElementsByTagName('li');
 
-    var btn = item[8].getElementsByTagName('span')[0];
+            var btn = item[8].getElementsByTagName('span')[0];
 
-    // var bar = document.getElementById('sidebar');
-    var bar = this.$refs.sidebar
+            // var bar = document.getElementById('sidebar');
+            var bar = this.$refs.sidebar
 
-    var barDraw = this.$refs.sidebarDraw
-    var barColor = this.$refs.sidebarColor
-    var showOff = true;
+            var barDraw = this.$refs.sidebarDraw
+            var barColor = this.$refs.sidebarColor
+            var showOff = true;
 
-    //画笔工具
-    item[0].onclick = function () {
+            //画笔工具
+            item[0].onclick = () =>{
+                bar.style.display = 'none';
+            this.showTip('你选择了画笔工具！');
+            this.drawPen();
+            };
+            //直线工具
+            item[1].onclick = () => {
+                bar.style.display = 'none';
 
-      that.showTip('你选择了画笔工具！');
-      that.drawPen();
-    };
-    //直线工具
-    item[1].onclick = function () {
+            this.showTip('你选择了直线工具！');
+            this.drawLine();
+            };
+            //圆形工具
+            item[2].onclick = () => {
+                bar.style.display = 'none';
 
-      that.showTip('你选择了直线工具！');
-      that.drawLine();
-    };
-    //圆形工具
-    item[2].onclick = function () {
+            this.showTip('你选择了圆形工具！');
+            this.drawCircle();
+            };
+            //矩形工具
+            item[3].onclick = () => {
+                bar.style.display = 'none';
 
-      that.showTip('你选择了圆形工具！');
-      that.drawCircle();
-    };
-    //矩形工具
-    item[3].onclick = function () {
+            this.showTip('你选择了矩形工具！');
+            this.drawRect();
+            };
+            //粗细工具
+            item[4].onclick = () => {
 
-      that.showTip('你选择了矩形工具！');
-      that.drawRect();
-    };
-    //粗细工具
-    item[4].onclick = function () {
+            barColor.style.display = 'none';
+            barDraw.style.display = 'block';
+            bar.style.right = 0;
+            bar.style.display = 'block';
+            };
+            //颜色工具
+            item[5].onclick = () => {
 
-      barColor.style.display = 'none';
-      barDraw.style.display = 'block';
-      bar.style.right = 0;
-    };
-    //颜色工具
-    item[5].onclick = function () {
+            barColor.style.display = 'block';
+            barDraw.style.display = 'none';
+            bar.style.right = 0;
+            bar.style.display = 'block';
+            };
+            //橡皮擦工具
+            item[6].onclick = () =>{
+                bar.style.display = 'none';
 
-      barColor.style.display = 'block';
-      barDraw.style.display = 'none';
-      bar.style.right = 0;
-    };
-    //橡皮擦工具
-    item[6].onclick = function () {
+            this.showTip('你选择了橡皮擦！');
+            this.eraser();
+            };
+            //撤退功能 
+            item[7].onclick = () => {
 
-      that.showTip('你选择了橡皮擦！');
-      that.eraser();
-    };
-    //撤退功能 
-    item[7].onclick = function () {
+            if (this.toBack()) {
 
-      if (that.toBack()) {
+                this.showTip('撤退成功！');
+            } else {
 
-        that.showTip('撤退成功！');
-      } else {
+                this.showTip('撤退无效！你没有绘画！', 'remove');
+            }
+            };
+            //隐藏与显示工具栏
+            item[8].onclick = () => {
 
-        that.showTip('撤退无效！你没有绘画！', 'remove');
-      }
-    };
-    //隐藏与显示工具栏
-    item[8].onclick = function () {
+            menu.style.top = '-400px';
+            showOff = false;
+            btn.className = 'glyphicon glyphicon-download';
+            };
+            item[8].onmouseover = () => {
 
-      menu.style.top = '-400px';
-      showOff = false;
-      btn.className = 'glyphicon glyphicon-download';
-    };
-    item[8].onmouseover = function () {
+            if (showOff) return;
+            showOff = true;
 
-      if (showOff) return;
-      showOff = true;
-
-      menu.style.top = '0';
-      btn.className = 'glyphicon glyphicon-upload';
-    };
-  },
+            menu.style.top = '0';
+            btn.className = 'glyphicon glyphicon-upload';
+            };
+        },
         //显示画板
         showBoard() {
 
@@ -250,7 +258,7 @@ export default {
 
             //取消菜单上的冒泡
             menu.onmousedown =  (ev)=> {
-                var ev = ev || event;
+                ev = ev || event;
                 ev.cancelBubble = true;
             };
             //菜单滑出
@@ -265,10 +273,9 @@ export default {
         drawPen() {
 
             document.onmousedown =  (ev) =>{
-
-            let ev = ev || event;
-            let sx = ev.clientX;
-            let sy = ev.clientY;
+            ev = ev || event;
+            let sx = ev.clientX -this.$refs.drawBoard.getBoundingClientRect().left;
+            let sy = ev.clientY -this.$refs.drawBoard.getBoundingClientRect().top;
             this.PENS++;
             //画笔性能优化 每36ms取一个点
             let onOff = true;
@@ -276,15 +283,14 @@ export default {
             document.onmousemove =  (ev) =>{
 
                 if (!onOff) return;
-                onOff = false;
+                    onOff = false;
                 setTimeout(()=> {
-                onOff = true;
+                    onOff = true;
                 }, 36);
-                let ev = ev || event;
-                let ex = ev.clientX;
-                let ey = ev.clientY;
+                ev = ev || event;
+                let ex = ev.clientX-this.$refs.drawBoard.getBoundingClientRect().left;
+                let ey = ev.clientY -this.$refs.drawBoard.getBoundingClientRect().top;
                 let n = this.DATA.length;
-
                 this.DATA[n] = new Object();
                 //为画笔绘制的对象定义属性'point-line'
                 //将该对象存入绘制数据中
@@ -322,16 +328,16 @@ export default {
         drawLine() {
             document.onmousedown =  (ev)=> {
 
-            var ev = ev || event;
-            var sx = ev.clientX;
-            var sy = ev.clientY;
+            ev = ev || event;
+            var sx = ev.clientX -this.$refs.drawBoard.getBoundingClientRect().left;
+            var sy = ev.clientY-this.$refs.drawBoard.getBoundingClientRect().top;
             var n = this.DATA.length;
 
             document.onmousemove =  (ev) =>{
 
-                var ev = ev || event;
-                var ex = ev.clientX;
-                var ey = ev.clientY;
+                ev = ev || event;
+                var ex = ev.clientX-this.$refs.drawBoard.getBoundingClientRect().left;
+                var ey = ev.clientY-this.$refs.drawBoard.getBoundingClientRect().top;
 
                 this.DATA[n] = new Object();
                 this.DATA[n].attr = 'line';
@@ -359,16 +365,16 @@ export default {
 
             document.onmousedown =  (ev) => {
 
-            var ev = ev || event;
-            var sx = ev.clientX;
-            var sy = ev.clientY;
+            ev = ev || event;
+            var sx = ev.clientX-this.$refs.drawBoard.getBoundingClientRect().left;
+            var sy = ev.clientY-this.$refs.drawBoard.getBoundingClientRect().top;
             var n = this.DATA.length;
 
             document.onmousemove = (ev)=> {
 
-                var ev = ev || event;
-                var ex = ev.clientX;
-                var ey = ev.clientY;
+                ev = ev || event;
+                var ex = ev.clientX-this.$refs.drawBoard.getBoundingClientRect().left;
+                var ey = ev.clientY-this.$refs.drawBoard.getBoundingClientRect().top;
 
                 var cx = ex - sx;
                 var cy = ey - sy;
@@ -397,14 +403,14 @@ export default {
 
             document.onmousedown =  (ev) =>{
 
-            var ev = ev || event;
+            ev = ev || event;
             var sx = ev.clientX;
             var sy = ev.clientY;
             var n = this.DATA.length;
 
             document.onmousemove =  (ev) => {
 
-                var ev = ev || event;
+                ev = ev || event;
                 var ex = ev.clientX;
                 var ey = ev.clientY;
 
@@ -439,7 +445,7 @@ export default {
             this.ERAS++;
             document.onmousemove =  (ev) =>{
 
-                var ev = ev || event;
+                ev = ev || event;
                 var ex = ev.clientX;
                 var ey = ev.clientY;
                 var n = this.DATA.length;
@@ -586,7 +592,7 @@ export default {
             tip.style.transition = '';
             tip.style.display = 'none';
             tip.style.top = '0';
-            }, 2000);
+            }, 500);
         },
         //自定义右键菜单
         customMenu () {
@@ -597,7 +603,7 @@ export default {
 
             clearTimeout(timer);
 
-            var ev = ev || event;
+            ev = ev || event;
             var sX = ev.clientX;
             var sY = ev.clientY;
 
@@ -650,71 +656,76 @@ export default {
             let imgURL = canvas.toDataURL(MIME_TYPE)
             let aElement = this.$refs.aElement
             
-            aElement.download = 'Picture'
+            aElement.download = 'yourpicture' //图片保存名字
             aElement.href = imgURL
             aElement.dataset.downloadurl = [MIME_TYPE, aElement.download, aElement.href].join(':')
             aElement.click()
-        }
+        },
+          //选择线条粗细
+        selectLine () {
 
-  //选择颜色
-//   selectColor () {
+            var bar = this.$refs.sidebar
+            bar.style.display='block'
+            let sidebarDraw = this.$refs.sidebarDraw
+            let barDrawLi = sidebarDraw.getElementsByTagName('li');
+            // var barDrawLi = document.querySelectorAll('.sidebar-draw li');
 
-//     // var bar = document.getElementById('sidebar');
-//     let bar=this.$refs.sidebar
-//     var barColorLi = document.querySelectorAll('.sidebar-color li');
-//     var arrColor = ['#f00056', '#fff', '#faff72', '#44cef6', '#00bc12', '#ffa400', '#000'];
+            //var btn = item[8].getElementsByTagName('span')[0];
 
-//     //取消冒泡
-//     bar.onmousedown =  (ev) => {
+            var arrLine = [3, 6, 9, 12, 15, 20];
 
-//       var ev = ev || event;
-//       ev.cancelBubble = true;
-//     };
-//     for (let i = 0; i < barColorLi.length; i++) {
+            //取消冒泡
+            bar.onmousedown = function (ev) {
+                ev = ev || event;
+                ev.cancelBubble = true;
+            };
+            for (let i = 0; i < barDrawLi.length; i++) {
 
-//       barColorLi[i].index = i;
-//       barColorLi[i].style.background = arrColor[i];
+                barDrawLi[i].index = i;
+                barDrawLi[i].onclick = (e) => {
+                    this.showTip('你重新选择了画笔宽度！')
+                    this.LINE = arrLine[i];
+                    // bar.style.right = '-'+this.W+'px';
+                    // bar.style.left = this.$refs.drawBoard.getBoundingClientRect().left+this.$refs.drawBoard.clientWidth+'px'
+                    bar.style.right = this.$refs.sidebar.clientWidth+'px'
+                    bar.style.display='none'
 
-//       barColorLi[i].onclick = function () {
+                };
+            }
+        },
 
-//         this.showTip('你重新选择了颜色！');
-//         this.COLOR = arrColor[this.index];
-//         bar.style.right = '-230px';
-//       };
-//     }
-//   },
+        //选择颜色
+        selectColor () {
 
-//   //选择线条粗细
-//   selectLine () {
+            let bar=this.$refs.sidebar
+            bar.style.display='block'
+            let sidebarColor = this.$refs.sidebarColor
+            let barColorLi = sidebarColor.getElementsByTagName('li');
 
-//     var that = this;
-//     var bar = document.getElementById('sidebar');
-//     var barDrawLi = document.querySelectorAll('.sidebar-draw li');
-//     var arrLine = [3, 6, 9, 12, 15, 20];
+            let arrColor = ['#f00056', '#fff', '#faff72', '#44cef6', '#00bc12', '#ffa400', '#000'];
+            //取消冒泡
+            bar.onmousedown =  (ev) => {
+                ev = ev || event;
+                ev.cancelBubble = true;
+            };
+            for (let i = 0; i < barColorLi.length; i++) {
 
-//     //取消冒泡
-//     bar.onmousedown = function (ev) {
-//       var ev = ev || event;
-//       ev.cancelBubble = true;
-//     };
-//     for (var i = 0; i < barDrawLi.length; i++) {
+                barColorLi[i].index = i;
+                barColorLi[i].style.background = arrColor[i];
 
-//       barDrawLi[i].index = i;
-//       barDrawLi[i].onclick = function () {
+                barColorLi[i].onclick =  () => {
 
-//         that.showTip('你重新选择了画笔宽度！');
-//         that.gloaObj.LINE = arrLine[this.index];
-//         bar.style.right = '-230px';
+                    this.showTip('你重新选择了颜色！');
+                    this.COLOR = arrColor[i];
+                    bar.style.right = this.$refs.sidebar.clientWidth+'px'
+                    // bar.style.left = this.$refs.drawBoard.getBoundingClientRect().left+this.$refs.drawBoard.clientWidth+'px'
+                    bar.style.display='none'
 
-//       };
-//     }
-//   },
+                };
+            }
+        },
 
-  
-
-  
-
-  
+ 
 
   
     }
@@ -728,10 +739,18 @@ export default {
     visibility: hidden;
 }
 .drawBoard{
-    width: 100%;
-    height: 100%;
-    background: #999;
+    width: 500px;
+    height:300px;
+    border: 2px solid #16A085;
+    background: #fff;
     position: absolute;
+    // z-index: 4;
+    top:0;
+    left: 50px;
+    // transform: translate(-50%,-50%);
+    // top:50%;
+    // left: 50%;
+    // transform: translate(-50%,-50%);
 }
 li{
 	list-style: none;
@@ -744,8 +763,9 @@ li{
 	z-index:3;
 	background:#000;
 	left: 0;
-	top: -400px;
-	display:none;
+    transform: translateX(-100%);
+	// top: -400px;
+	// display:none;
 	transition: 0.5s ease-out;
 }
 #menu li{
@@ -753,7 +773,7 @@ li{
 	height: 50px;	
 	text-align: center;	
 	position: relative;
-	cursor: pointer;
+    cursor: pointer;
 	overflow: hidden;
 }
 #menu li span{
@@ -790,85 +810,75 @@ li{
 	top: 0;
 	right: -230px;
 	transition: 0.5s ease-out;
+    display: none;
 }
 .sidebar-draw{
+	height: 100%;
+    background: #ccc;
 	display: none;
+    ul{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        li{
+            width: 100%;
+            flex: 1;
+	        border-bottom: 1px solid #000;
+            &:hover{
+	            background: #000;
+            }
+            span{
+                border-radius: 5px;
+                display: block;
+	            width: 180px;
+	            background: #fff;
+            }
+        }
+    }
 }
-.sidebar-draw h2{
-	width: 100%;
-	height:40px;
-	font: bold 20px/40px "微软雅黑";
-	color: #fff;
-	text-align: center;
-}
-.sidebar-draw li{
-	width: 100%;
-	height: 60px;
-	overflow: auto;
-	border-bottom: 1px solid #000;
-}
-.sidebar-draw li:hover{
 
-	background: #000;
-}
-.sidebar-draw li span{
-	border-radius: 5px;
-}
 .sidebar-draw ul li:nth-child(1) span{
-	display: block;
-	width: 180px;
 	height: 3px;
 	margin: 28.5px auto 0;
-	background: #fff;
 }
 .sidebar-draw ul li:nth-child(2) span{
-	display: block;
-	width: 180px;
 	height: 6px;
 	margin: 27px auto 0;
-	background: #fff;
 }
 .sidebar-draw ul li:nth-child(3) span{
-	display: block;
-	width: 180px;
 	height: 9px;
 	margin: 25.5px auto 0;
-	background: #fff;
 }
 .sidebar-draw ul li:nth-child(4) span{
-	display: block;
-	width: 180px;
 	height: 12px;
 	margin: 24px auto 0;
-	background: #fff;
 }
 .sidebar-draw ul li:nth-child(5) span{
-	display: block;
-	width: 180px;
 	height: 15px;
 	margin: 22.5px auto 0;
-	background: #fff;
 }
 .sidebar-draw ul li:nth-child(6) span{
-	display: block;
-	width: 180px;
 	height: 18px;
 	margin: 21px auto 0;
-	background: #fff;
 }
 .sidebar-color{
+    height: 100%;
+    background: #000;
 	display: none;
+    ul{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        li{
+            flex: 1;
+            margin: 10px 0;
+        }
+    }
 }
-.sidebar-color h2{
-	width: 100%;
-	height:40px;
-	font: bold 20px/40px "微软雅黑";
-	color: #fff;
-	text-align: center;
-}
+
 .sidebar-color li{
 	height: 30px;
-	margin-bottom: 30px;
+	margin-bottom: 10px;
 }
 .sidebar-color li:hover{
 	border: 2px solid #fff;

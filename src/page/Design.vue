@@ -35,6 +35,7 @@
             <div class="designCon">
                 <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
                     <text-box v-if="designStore.layoutInfo.textBox" v-location="designStore.layoutInfo.textBox"/>
+                    <!-- <drawing-board /> -->
                     <!-- <div @click="showMediaUpload">点击重新添加告警音乐</div>
                     <div>
                         <input type="text" v-model="title"/>
@@ -43,7 +44,7 @@
                         <input type="text" v-model="subtitle" />                   
                     </div> -->
                 </div>
-                <div class="nodePosInfo">
+                <div class="nodePosInfo"> 
                     <componets-con :operate-type="'design'"></componets-con>
                 </div>
                 <loading v-if="isLoging" marginTop="-30%"></loading>
@@ -67,6 +68,7 @@ import componetsBox from '../components/designItems/componetsBox'
 import componetsCon from '../components/designItems/itemsContainer'
 import componetsSet from '../components/designItems/infoSetBox'
 import loading from '../components/showItems/Loading'
+import showItems from '../components/showItems'
 import utils from '../components/designItems/utils'
 import {createNamespacedHelpers} from 'vuex'
 const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designStore')
@@ -86,6 +88,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             componetsCon,
             componetsSet,
             loading,
+            ...showItems,
             ...utils
         },
         created() {

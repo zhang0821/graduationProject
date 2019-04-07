@@ -100,13 +100,13 @@ devMiddleware.waitUntilValid(() => {
     if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
       opn(uri)
     }
-    server = app.listen(port)
+    // server = app.listen(port)
     // server=require('../serverTools/socket')
     // server=mqtt.socket
 
 
-    // server =require('../serverTools/mqtt').socket
-    // console.log('进入dev-server.js,监听的端口是')
+    server =require('../serverTools/mqtt').socket
+    console.log('进入dev-server.js,监听的端口是')
     _resolve()
   })
 })

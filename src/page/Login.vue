@@ -17,6 +17,8 @@
                 <input type="text" placeholder="Email" :class="'log-input' + (account==''?' log-input-empty':'')" v-model="account"><input type="password" placeholder="Password" :class="'log-input' + (password==''?' log-input-empty':'')"  v-model="password">
                 <a href="javascript:;" class="log-btn" @click="login">登录</a>
                 <a href="javascript:;" class="reg-btn" @click="()=>{this.showLogin=0}">注册</a>
+                <p v-if="inputError!=null" class="inputError">{{inputError}}</p>
+
             </div>
             <Loading v-if="isLoging" marginTop="-30%"></Loading>
         </div>
@@ -86,20 +88,20 @@ export default {
     Loading
   },
   created() {
-      this.goDesign()
+    //   this.goDesign()
    
    
-//    //发起请求，获取公钥私钥。
-//     this.$http.post('/sysInit').then((response) => {
-//         let keyInfo=response.data
-//         //使用sessionStorage存储，
-//         if(keyInfo){
-//             console.log('获取到的公钥是',keyInfo)
-//             sessionStorage.setItem("pKey",keyInfo)
-//         }
-//     }).catch(err=>{
-//         console.log('出错',err)        
-//     }) 
+   //发起请求，获取公钥私钥。
+    this.$http.post('/sysInit').then((response) => {
+        let keyInfo=response.data
+        //使用sessionStorage存储，
+        if(keyInfo){
+            console.log('获取到的公钥是',keyInfo)
+            sessionStorage.setItem("pKey",keyInfo)
+        }
+    }).catch(err=>{
+        console.log('出错',err)        
+    }) 
   },
   methods:{
 
@@ -171,6 +173,7 @@ export default {
 
              }else{
                 this.isLoging = false;
+                this.inputError='输入信息无效'
                 this.account=null;
                 this.password=null
             }
