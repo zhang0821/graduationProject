@@ -44,6 +44,12 @@
                 <li>
                     <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='textBox'>文本框</div>
                 </li>
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='title'>一级标题</div>
+                </li>
+                <li>
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='subtitle'>二级标题</div>
+                </li>
             </ul>
         </div>
     </section>
@@ -73,8 +79,8 @@ export default {
                 type: componentName,
                 width:e.target.offsetWidth,
                 height:e.target.offsetHeight,
-                top:0,
-                left:0
+                top:e.target.offsetY,
+                left:e.target.offsetX
             }
             e.dataTransfer.setData('info', JSON.stringify(info))
         },

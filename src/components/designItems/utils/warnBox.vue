@@ -1,5 +1,8 @@
 <template>
-     <div class="marquee" v-resizable>
+<vue-draggable-resizable   drag-handle=".marquee_title" :resizable="design"  :draggable="design"  @dragstop="dragstopCb"
+                 :x="detialInfo.left" :y="detialInfo.top" :w="500" :h="100" :minh="30" :minw="50" :parent="true" >
+
+     <div class="marquee">
         <div class="marquee_title">
             <span>报警消息</span>
         </div>
@@ -12,11 +15,11 @@
                     <span v-else-if="item.type == 'door'">门禁传感器报警</span>
                     <span v-else-if="item.type == 'water'">水浸传感器报警</span>
                     <span v-else-if="item.type == 'air'">气体传感器报警!当前氨气：{{item.nh4}},湿度：{{item.h2s}}</span>
-
                 </li>
             </ul>
         </div>
     </div>
+</vue-draggable-resizable>
 </template>
 
 <script>
@@ -27,8 +30,21 @@ export default {
             animate: false,
         }
     },
+    props:{
+        detialInfo:{
+            type:Object,
+        },
+        dragstopCb:{
+            type:Function
+        },
+        design:{
+            type:Boolean,
+            required: true,
+            default:false
+        }
+    },
     created() {
-        // setInterval(this.showMarquee, 5000)
+        setInterval(this.showMarquee, 5000)
     },
     computed:{
         ...mapState('dataTrans',{
@@ -41,13 +57,17 @@ export default {
         }
     },
     methods: {
-        showMarquee: function () {
-            this.animate = true;
-            setTimeout(()=>{
-                this.marqueeList.push(this.marqueeList[0]);
-            this.marqueeList.shift();
-            this.animate = false;
-        },500)},
+        showMarquee(){
+            if(this.marqueeList.length>0){
+                this.animate = true;
+                setTimeout(()=>{
+                    
+                        this.marqueeList.push(this.marqueeList[0]);
+                    this.marqueeList.shift();
+                    this.animate = false;
+                },500)
+            }
+        },    
     }
 }
 </script>
@@ -61,7 +81,7 @@ div, ul, li, span, img {
 }
 .marquee {
 	width: 100%;
-	height: 50px;
+	height: 100%;
 	align-items: center;
 	color: #fff;
 	background-color: #8bb4c0;
@@ -71,37 +91,44 @@ div, ul, li, span, img {
 
 .marquee_title {
 	padding: 0 20px;
-	height: 30px;
+	height: 80%;
 	font-size: 20px;
 	border-right: 1px solid #d8d8d8;
 	align-items: center;
     color: red;
+    &:hover{
+        cursor: move;
+    }
 }
 
 .marquee_box {
 	display: block;
 	position: relative;
-	width: 60%;
-	height: 30px;
+	flex: 1;
+	height: 80%;
 	overflow: hidden;
 }
 
 .marquee_list {
 	display: block;
+    height: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 .marquee_top {
-	transition: all 0.5s;
-	margin-top: -30px
+	transition: all 1s;
+	margin-top: -100%;
 }
 
 .marquee_list li {
-	height: 30px;
-	line-height: 30px;
+	height: 100%;
 	font-size: 14px;
 	padding-left: 20px;
+    display: flex;
+    background: #0e4252;
+    align-items: center;
+    
 }
 
 .marquee_list li span {

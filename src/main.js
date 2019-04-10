@@ -12,8 +12,11 @@ import 'vue-contextmenu/style/css/font-awesome.min.css'
 import 'bootstrap/dist/js/bootstrap.js'
 import { JSEncrypt } from 'jsencrypt' //RSA加密
 import VueContextMenu  from 'vue-contextmenu' //右键菜单组件
+import VueDraggableResizable from 'vue-draggable-resizable'
+Vue.component('vue-draggable-resizable', VueDraggableResizable)
 
 import './directives' //自定义指定组件
+
 Vue.use(VueContextMenu)
 // import * as socketio from 'socket.io-client'
 // import * as VueSocketIO from 'vue-socket.io'

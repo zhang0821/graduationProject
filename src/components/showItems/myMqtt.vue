@@ -8,7 +8,7 @@ import Vue from 'vue'
 import store from '@/store/'
 import * as socketio from 'socket.io-client'
 import * as VueSocketIO from 'vue-socket.io'
-import { setTimeout, setInterval, clearInterval } from 'timers';
+import { setTimeout, setInterval, clearInterval } from 'timers'
 
 export default {
   data() {
@@ -42,10 +42,21 @@ export default {
       // // Send the "pingServer" event to the server.
       // this.$socket.emit('pingServer', 'PING!')
     },
+    ping(interval=5){
+        setInterval(()=>{
+            this.SocketInstance.emit('myPing',this.SocketInstance.id)
+        },interval*1000)
+       
+      this.SocketInstance.on('myPong',(data)=>{
+          this.SocketInstance.emit('reply',this.SocketInstance.id)
+        })
+
+    },
   },
   mounted() {
     this.SocketInstance.on('connect',()=>{
         console.log('mqtt连接成功')
+        this.ping()
     })
     this.SocketInstance.on('devMsg',(data)=>{
         let dataObj=JSON.parse(data)

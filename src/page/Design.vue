@@ -15,7 +15,7 @@
                 </ul>
                 <ul>
                     <li @click="complete">提交</li>
-                    <li @click="save">保存</li>
+                    <li @click="showMediaUpload">资源上传</li>
                     <li @click="emptyState()">清空</li>
                 </ul>
                 <ul>
@@ -28,33 +28,43 @@
     
         <div class="main">
     
+            <!-- 图元组件库 -->
             <div class="itemsCon" v-if="designStore.previewClick==0">
                 <componets-box class="myComp" ref="componetsBox" />
                 <!-- myComponents 使用ref属性后的元素，该元素则可以通过 this.$refs.myComponents 被作为DOM元素引用-->
             </div>
+
+
             <div class="designCon">
+
+                <!-- 通用组件放置位置 -->
                 <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
-                    <text-box v-if="designStore.layoutInfo.textBox" v-location="designStore.layoutInfo.textBox"/>
+                    <text-box v-if="designStore.layoutInfo.textBox!=null" :detial-info="designStore.layoutInfo.textBox" :design="true" :dragstop-cb="onDragstop"/>
                     <!-- <drawing-board /> -->
-                    <!-- <div @click="showMediaUpload">点击重新添加告警音乐</div>
-                    <div>
+                    <div v-if="designStore.layoutInfo.title">
                         <input type="text" v-model="title"/>
                     </div>
-                    <div>
+                    <div v-if="designStore.layoutInfo.subtitle">
                         <input type="text" v-model="subtitle" />                   
-                    </div> -->
+                    </div>
                 </div>
-                <div class="nodePosInfo"> 
-                    <componets-con :operate-type="'design'"></componets-con>
+
+                <!-- 节点组件放置位置 -->
+                <div class="nodePosInfo" ref="nodeCon" > 
+                    <componets-con :operate-type="'design'" :mouse-pos='getCurPos' :parent-drop="drop" ></componets-con>
                 </div>
+
+
                 <loading v-if="isLoging" marginTop="-30%"></loading>
             </div>
 
-            <!-- 配置相关细节信息 -->
+            <!-- 图元信息配置模块 -->
             <div class="toolCon" v-if="designStore.detialToolsBox.show && designStore.previewClick==0">
                 <componets-set :tool-box-info="designStore.detialToolsBox" ></componets-set>
             </div>
         </div>
+
+
 
         <!-- 上传文件选择框 -->
         <div class="fileUploadBox" v-if="mediaUpload">
@@ -101,6 +111,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
         computed:{
             ...mapState({
                 designStore:state=>state,
+
             }), 
             title:{
                 get:function(){
@@ -127,8 +138,11 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             ]),
             ...mapMutations([
                 'updateTitle',
+                'updateTable',
+                'addNodes',
                 'emptyState',
                 'deleteItem',
+                'undateNodesPos',
                 'updateLayoutState'
             ]),
             showMediaUpload(){
@@ -140,18 +154,82 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 console.log('showUploadBox当前状态值',this.mediaUpload)
 
             },
+            getCurPos(e){
+                console.log('外部鼠标坐标获取函数',e)
+                e = e || window.event
+                var D = document.documentElement
+                var posInfo
+                if (e.pageX){
+                    posInfo= {
+                        x: e.pageX,
+                        y: e.pageY
+                    }
+                }else { 
+                    posInfo={
+                        x: e.clientX + D.scrollLeft - D.clientLeft,   
+                        y: e.clientY + D.scrollTop - D.clientTop  
+                    }  
+                }
+                return{
+                    posx:Math.floor((posInfo.x-this.$refs.nodeCon.getBoundingClientRect().left)/this.$refs.nodeCon.clientWidth*10000)/10000,
+                    posy:Math.floor((posInfo.y-this.$refs.nodeCon.getBoundingClientRect().top)/this.$refs.nodeCon.clientHeight*10000)/10000,
+                    left:posInfo.x,
+                    top:posInfo.y
+                }
+            },
+            
+            drop(e,curTab) { //松开拖放,e是容器元素
+                    console.log("info具体信息",e.dataTransfer.getData('info'))
+                let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
+                //若此时没有初始化tab页，则也不允许节点元素被拖拽进入
+                //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
+                if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
+                    return
+
+                let mouse=this.getCurPos(e)                
+                if(info.compType == 'node' ){
+                    if(Object.keys(this.designStore.pageTabs).length < 0 || this.designStore.pageTabs[curTab].table.hasSet){//或者当前为表格页
+                        return
+                    }
+                    if(info.changePos){
+                        Object.assign(info,mouse)
+                        this.undateNodesPos(info)
+                    }else{
+                        let storeNode={
+                            tabIndex:curTab
+                        }
+                        Object.assign(storeNode,mouse,info)
+                        console.log('存储元素',storeNode)
+                        this.addNodes(storeNode)
+                    }
+                    
+                }else{
+                    if(info.type == 'table'){
+                        console.log('进入增加table到当前页')
+                        this.updateTable(curTab)
+                        return
+                    }
+                    let storeLayout={
+                        [info.type]:{}
+                    }
+                    Object.assign(storeLayout[info.type],mouse,info)
+                    console.log('drop组件保存信息是',storeLayout)
+                    this.updateLayoutState(storeLayout)
+                }
+            },
             /**通用控件放置处 */
             layoutDrop(e){
+                console.log('当前元素位置信息：')
+                 let mouse=this.getCurPos(e)
                 let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
                 if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                     return
                 console.log('目前放置到通用组件位置的元素是',info)  
                 let storeLayout={
-                    [info.type]:{
-                        hasSet:1
-                    }
+                    [info.type]:' '
                 }
-                Object.assign(storeLayout[info.type],info)
+                Object.assign(storeLayout[info.type],mouse,info)
+                console.log('通用组件保存信息是',storeLayout)
                 this.updateLayoutState(storeLayout)
 
             },
@@ -184,6 +262,9 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             },
             draw() {
             },
+            onDragstop(x,y) {
+                console.log('文本框停止拖拽后left和top',x,y)
+            },
     
             /**预览 */
             preview() {
@@ -196,13 +277,15 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 this.postToServer({'usr':this.usr}).then((result) => {
                     console.log('数据提交后服务器返回结果',result)
                     this.isLoging=0
+                    //重新跳转到登录界面
+                    this.$router.push({
+                        name:'Login'
+                    })
                 }).catch((err) => {
-                    console.log('postToServer错误')
+                    this.isLoging=0
+                    console.log('postToServer错误',err)
                 });
-                //重新跳转到登录界面
-                 this.$router.push({
-                    name:'Login'
-                })
+                
             },
     
             /**保存

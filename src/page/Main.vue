@@ -4,8 +4,8 @@
         <div class="header">
     
             <div class="title">
-                <h1 ref="h1">{{designStore.layoutInfo.title}}</h1>
-                <h4>{{designStore.layoutInfo.subtitle}}</h4>
+                <h1 ref="h1" v-if="designStore.layoutInfo.title">{{designStore.layoutInfo.title}}</h1>
+                <h4 v-if="designStore.layoutInfo.subtitle">{{designStore.layoutInfo.subtitle}}</h4>
             </div>
         	<audio v-if="designStore.layoutInfo.fireMusic && myaudio!=null"  hidden :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" ref="audioRef" controls="controls"  id="music"  loop="loop"   preload="auto">
             </audio>
@@ -17,11 +17,11 @@
             <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
         </div>
           
-        <div class="warnScroll" v-if="designStore.layoutInfo.warnBox.hasSet">
-            <text-scroll-box></text-scroll-box>
-        </div>
+        <!-- <div class="warnScroll"> -->
+            <warn-box  v-if="designStore.layoutInfo.warnBox" :detial-info="designStore.layoutInfo.warnBox" :design="false" :dragstop-cb="(x,y)=>{}"></warn-box>
+        <!-- </div> -->
       <div @click="goDesign" class="goDesign">design</div>
-      <final-mqtt :username="usr"></final-mqtt>
+      <my-mqtt :username="usr"></my-mqtt>
     </div>
 </template>
 <script>

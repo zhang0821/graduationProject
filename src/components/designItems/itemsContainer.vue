@@ -1,6 +1,6 @@
 <template>
     <section v-if="operateType=='design'" class="designcontainer">
-        <ul>
+        <ul v-if="Object.keys(tabArr).length">
             <li v-for="(tab,index) in Object.keys(tabArr)" :class="{active:index == curTab}" @click="showTab(index)" @dblclick="fileLoad(tabArr[index].name)">{{tab}}</li>
         </ul>
 
@@ -11,12 +11,15 @@
                 <table-gener v-else />
             </div>  
             <!-- 是否注册了报警 -->
-            <text-scroll-box v-if="layoutInfo.warnBox"  draggable="true" @dragstart="dragStart" >
-
-            </text-scroll-box>
+            <!-- <vue-draggable-resizable  v-if="layoutInfo.warnBox!=null" drag-handle=".marquee_title"  :resizable="true"
+                 :x="layoutInfo.warnBox.left" :y="layoutInfo.warnBox.top" :w="500" :h="100" :minh="30" :minw="50" :parent="true" >
+                <text-scroll-box ></text-scroll-box>
+            </vue-draggable-resizable> -->
+            <warn-box v-if="layoutInfo.warnBox!=null" :detial-info="layoutInfo.warnBox" :design="true" :dragstop-cb="onDragstop"></warn-box>
             
         </div>
         <!-- 文件上传组件 -->
+
         <div v-if="showUploadBox" class="fileUploadBox">
             <i class="close" @click="finishUpload">x</i>
             <input type="text" v-model="tabName">
@@ -79,7 +82,7 @@ export default {
             showUploadBox:false,
         }
     },
-    props:['operateType'],
+    props:['operateType','mousePos','parentDrop'],
     created(){
        //关于背景图片，如果已经设置了图片，则在初始化时，加载图片
        Object.keys(this.tabArr).forEach(index=>{
@@ -134,26 +137,6 @@ export default {
         }
     },
     methods: {
-        getCurPos(e){
-            e = e || window.event
-            var D = document.documentElement
-            var posInfo
-            if (e.pageX){
-                posInfo= {
-                    x: e.pageX,
-                    y: e.pageY
-                }
-            }else { 
-                posInfo={
-                    x: e.clientX + D.scrollLeft - D.clientLeft,   
-                    y: e.clientY + D.scrollTop - D.clientTop  
-                }  
-            }
-            return{
-                posx:Math.floor((posInfo.x-this.$refs.preview.getBoundingClientRect().left)/this.$refs.preview.clientWidth*10000)/10000,
-                posy:Math.floor((posInfo.y-this.$refs.preview.getBoundingClientRect().top)/this.$refs.preview.clientHeight*10000)/10000
-            }
-        },
         ...mapMutations({
             addNode:'designStore/addNodes',
             updateTable:'designStore/updateTable',
@@ -162,17 +145,23 @@ export default {
 
         }),
         dragStart(e){
-            let info = {
-                compType:'common',
-                type:'warnBox',
-                changePos:true,
+            // let info = {
+            //     compType:'common',
+            //     type:'warnBox',
+            //     changePos:true,
 
-                width:e.target.offsetWidth,
-                height:e.target.offsetHeight,
+            //     width:e.target.offsetWidth,
+            //     height:e.target.offsetHeight,
 
-            } 
-            console.log('报警框再次拖拽事件')
-            e.dataTransfer.setData('info', JSON.stringify(info))
+            // } 
+            // console.log('报警框再次拖拽事件')
+            // e.dataTransfer.setData('info', JSON.stringify(info))
+        },
+        onResizing(x, y, width, height){
+            console.log('onResizing!!x:y,width,height',x, y, width, height)
+        },
+        onDragstop(left,top){
+            console.log('onDragstop!!x:y,width,height',left,top)
         },
         dragOver(e) {
             console.log('dragOver函数进入')
@@ -180,42 +169,44 @@ export default {
         },
         drop(e) { //松开拖放,e是容器元素
          console.log("info具体信息",e.dataTransfer.getData('info'))
-            let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
-            //若此时没有初始化tab页，则也不允许节点元素被拖拽进入
-            //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
-            if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
-                return
-            if(info.compType == 'node' ){
-                if(Object.keys(this.tabArr).length < 0 || this.tabArr[this.curTab].table.hasSet){//或者当前为表格页
-                    return
-                }
-                let mouse=this.getCurPos(e)
-                if(info.changePos){
-                     Object.assign(info,mouse)
-                    this.undateNodesPos(info)
-                }else{
-                    let storeNode={
-                        tabIndex:this.curTab
-                    }
-                    Object.assign(storeNode,mouse,info)
-                    console.log('存储元素',storeNode)
-                    this.addNode(storeNode)
-                }
+        this.parentDrop(e,this.curTab)
+
+        //     let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
+        //     //若此时没有初始化tab页，则也不允许节点元素被拖拽进入
+        //     //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
+        //     if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
+        //         return
+        //     if(info.compType == 'node' ){
+        //         if(Object.keys(this.tabArr).length < 0 || this.tabArr[this.curTab].table.hasSet){//或者当前为表格页
+        //             return
+        //         }
+        //         let mouse=this.mousePos(e)
+        //         if(info.changePos){
+        //              Object.assign(info,mouse)
+        //             this.undateNodesPos(info)
+        //         }else{
+        //             let storeNode={
+        //                 tabIndex:this.curTab
+        //             }
+        //             Object.assign(storeNode,mouse,info)
+        //             console.log('存储元素',storeNode)
+        //             this.addNode(storeNode)
+        //         }
                 
-            }else{
-                if(info.type == 'table'){
-                    console.log('进入增加table到当前页')
-                    this.updateTable(this.curTab)
-                    return
-                }
-                let storeLayout={
-                    [info.type]:{
-                        hasSet:1
-                    }
-                }
-                Object.assign(storeLayout[info.type],info)
-                this.updateLayoutState(storeLayout)
-            }
+        //     }else{
+        //         if(info.type == 'table'){
+        //             console.log('进入增加table到当前页')
+        //             this.updateTable(this.curTab)
+        //             return
+        //         }
+        //         let storeLayout={
+        //             [info.type]:{
+        //                 hasSet:1
+        //             }
+        //         }
+        //         Object.assign(storeLayout[info.type],info)
+        //         this.updateLayoutState(storeLayout)
+        //     }
         },
         clickPreview(e) {
             let target = e.target
@@ -251,6 +242,7 @@ export default {
         display: flex;
         margin: 0;
         color:#fff;
+        border-bottom: 1px solid #D35400;
         li{
             list-style: none;
             padding: 5px 30px;
@@ -273,7 +265,7 @@ export default {
         flex: 1;
         display: flex;
         flex-direction: column;
-        border-top: 1px solid #D35400;
+        // border-top: 1px solid #D35400;
         .preview-area{
             flex: 1;
             // border:3px solid #fff;

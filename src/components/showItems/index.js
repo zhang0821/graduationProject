@@ -1,10 +1,10 @@
-import finalMqtt from './finalMqtt.vue'
+import myMqtt from './myMqtt.vue'
 import showPage from './showPage.vue'
 import tableShow from './tableShow.vue'
 import tableGener from './tableGener.vue'
 import drawingBoard from './drawingBoard.vue'
 export default{
-    finalMqtt,
+    myMqtt,
     showPage,
     tableShow,
     tableGener,

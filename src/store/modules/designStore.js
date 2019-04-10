@@ -2,6 +2,8 @@
 
 import axios from 'axios'
 import Vue from 'vue'
+import { setTimeout, setInterval, clearInterval } from 'timers'
+import designTrans from './dataTrans'
 const state = {
     // components: [], //预览视图的组件树
 
@@ -27,23 +29,25 @@ const state = {
 
     /**页面tab页页数 */
     layoutInfo:{
-        title:'请键入一级标题',
-        subtitle:'请键入二级标题',
+        // title:'请键入一级标题',
+        // subtitle:'请键入二级标题',
         fireMusic:false,
+        offlineTimer:10,
+        // warnBox:{}
         // warnBox:{
         //     hasSet:0,
         // }
     },
     /**保存每个页面节点信息 */
     pageTabs:{
-        0:{
-            name:'默认',
-            imgload:false,
-            designComponents:[],
-            table:{
-                hasSet:false
-            }
-        }
+        // 0:{
+        //     name:'默认',
+        //     imgload:false,
+        //     designComponents:[],
+        //     table:{
+        //         hasSet:false
+        //     }
+        // }
     }
 
     
@@ -54,6 +58,25 @@ const getters = {
 }
 const actions = {
     /**将信息上传到服务器 */
+    validInfo(context){
+        return new Promise((resolve, reject)=>{
+            if(!context.state.layoutInfo.fireMusic){
+                alert('请添加告警音乐！')
+                resolve(false)
+            }
+            if(Object.keys(context.state.pageTabs).length){
+                for(let i=0;i<Object.keys(context.state.pageTabs).length;i++){
+                    if(!context.state.pageTabs[i].imgload){
+                        alert('请为tab也添加布局图片！')
+                        resolve(false)
+                        break
+                    }
+                }
+            }
+            resolve(true)
+        })
+       
+    },    
     postToServer(context,obj){
         console.log('上传到服务器的用户名是：',obj)
         return new Promise((resolve, reject) => {
@@ -253,10 +276,43 @@ const mutations = {
     },
     /**接收mqtt传来信息，更新全局存储节点的变量 */
     updateNodesList(state,obj){
+
         console.log('designStore接收mqtt数据被调用,数据是obj.tabIndex:',obj.tabIndex,'obj.nodeIndex:',obj.nodeIndex)
-        state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=obj.status
-        console.log('当前要被改变的节点的状态值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].status)
         
+        state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=obj.status
+        // this.commit('monitorNodesState',obj)
+        console.log('当前要被改变的节点的状态值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].status)
+
+
+
+        //获取统计vuex中数据
+        console.log('designTrans中的报警信息是',designTrans.state.warnInfo)
+         //设定定时器，转化为离线状态，若离线，则也要加入报警框提醒中
+         console.log('目前该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+         if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']){
+             clearTimeout(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+         }
+         let timeOutTimer=setTimeout(()=>{
+             state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+         },state.layoutInfo.offlineTimer*1000)
+         state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
+         console.log('下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+        
+    },
+    /**节点状态变更处理函数 */
+    monitorNodesState(state,obj){
+        console.log('进入函数monitorNodesState')
+        //设定定时器，转化为离线状态，若离线，则也要加入报警框提醒中
+        console.log('目前该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+        if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']){
+            clearTimeout(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+        }
+        let timeOutTimer=setTimeout(()=>{
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+        },20*1000)
+        state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
+        console.log('下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+
     }
 }
 export default {

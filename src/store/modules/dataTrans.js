@@ -1,5 +1,6 @@
 import data from '@/utils/jsondata'
 import axios from 'axios'
+import designStore from './designStore'
 
 const state = {
     audio:null,
@@ -69,6 +70,7 @@ const mutations = {
                 }
             }
         }
+        // designStore.commit('monitorNodesState',obj)
 
     },
     updateInfo(state,newInfo){ 

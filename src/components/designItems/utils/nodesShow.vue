@@ -1,27 +1,24 @@
 <template>
     <div class="sensorparsebox" ref="sensorparsebox" @click="setParam" >
         <div v-if="infos.length !=0" >
-            <div v-for="item in infos" v-if="design === 'design'">
-                    <div  :class="item.type"  class="nodes"
-                            :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
-                                        left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px'}" 
-                            draggable="true" @dragstart="dragStart" @contextmenu.prevent="showMenu(item.id)"
-                            :data-arrId="item.id"  :data-tabIndex="item.tabIndex" >
-                            <!-- {{item.tabIndex+'-'+item.id}} -->
-                            <i v-if="item.dev_eui">{{item.dev_eui}}</i>
-                            <i v-else>{{item.type}}</i>
+            <div v-for="item in infos" >
+                <div v-if="design === 'design'" :class="item.type"  class="nodes"
+                        :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
+                                    left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px'}" 
+                        draggable="true" @dragstart="dragStart" @contextmenu.prevent="showMenu(item.id)"
+                        :data-arrId="item.id"  :data-tabIndex="item.tabIndex" >
+                        <!-- {{item.tabIndex+'-'+item.id}} -->
+                        <i v-if="item.dev_eui">{{item.dev_eui}}</i>
+                        <i v-else>{{item.type}}</i>
 
-                            <!-- 节点右键菜单弹出 -->
-                            <vue-context-menu :contextMenuData="contextMenuData"
-                            :transferIndex="transferIndex"
-                            @delete="deleteItem({tabIndex:item.tabIndex,id:item.id})"
-                            @modify="modifyItem"></vue-context-menu>
-                    </div>
-            </div>
-            
-            <div v-else>
-                <div class="nodes" :class="[item.type,item.status === 0 ? 'warn' : (item.status === 1 ? 'normal' :'offLine')]"
+                        <!-- 节点右键菜单弹出 -->
+                        <vue-context-menu :contextMenuData="contextMenuData"
+                        :transferIndex="transferIndex"
+                        @delete="deleteItem({tabIndex:item.tabIndex,id:item.id})"
+                        @modify="modifyItem"></vue-context-menu>
+                </div>
 
+                <div v-else class="nodes" :class="[item.type,item.status === 0 ? 'warn blink_warn' : (item.status === 1 ? 'blink_normal normal' :'offLine')]"
                         :style="{ top: (Math.round(item.posy*sensorContainerHeight,2))-15+'px', 
                                     left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px',
                                     }" >
@@ -43,7 +40,10 @@
                                     </div>
   
                 </div>
+
             </div>
+            
+            
         </div>
      
     </div>
@@ -83,7 +83,7 @@ export default {
     },
     props:['infos','design'],
     created() {
-        console.log('nodesshow传入的design参数是,',this.design)
+        console.log('!!!!nodesshow传入的design参数是,',this.design,'传入的infos是',this.infos)
         const _self = this
         _self.$nextTick(()=>{ //也可在mounted中执行
              _self.sensorContainerWidth=_self.$refs.sensorparsebox.clientWidth
@@ -196,6 +196,18 @@ $door:#8A5B47;
 $temHum: #446F9E;
 $smoke:rgba(214,190,46,0.6);
  
+
+@keyframes opacityChange {
+    0%{opacity: 0;}
+    50% {opacity: .5;}
+    100%{opacity: 1;}
+}
+.blink_normal{
+    animation: opacityChange 5s linear infinite;
+}
+.blink_warn{
+    animation: opacityChange 1s linear infinite;
+}
 .sensorparsebox{
     .nodes{
         cursor: pointer;

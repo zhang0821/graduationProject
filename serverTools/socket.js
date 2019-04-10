@@ -225,7 +225,7 @@ var infosNamespace=io.on('connect',(socket)=>{
   /*** 断开连接时  */
   socket.on('disconnecting',(reason)=>{
     console.log('断开的原因是：',reason)
-    //socketEvent.clientLeaveRoom(socket,roomname)
+    socketEvent.clientLeaveRoom(socket,roomname)
   })
   /**完全断开连接 */
   socket.on('disconnect', (reason) => {
@@ -239,8 +239,8 @@ var infosNamespace=io.on('connect',(socket)=>{
     socket.emit('myPong','ack from server')
   })
   socket.on('reply',(data)=>{
-    // console.log('收到客户端的repay,',data,'该客户端是',socket.id)
-    //redis.addCtoOnline(socket.id,1) // 点名表 该元素置1
+    console.log('收到客户端的repay,',data,'该客户端是',socket.id)
+    redis.addCtoOnline(socket.id,1) // 点名表 该元素置1
   })
 })
 

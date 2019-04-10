@@ -1,7 +1,7 @@
 /**
  *
  * @Description 邮件发送 
- * 调用方法:sendMail('amor_zhang@qq.com','这是测试邮件', 'Hi Amor,这是一封测试邮件');
+ * 调用方法:sendMail('address','title', 'context');
  *
  */
  
