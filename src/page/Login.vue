@@ -88,20 +88,20 @@ export default {
     Loading
   },
   created() {
-    //   this.goDesign()
+      this.goDesign()
    
    
    //发起请求，获取公钥私钥。
-    this.$http.post('/sysInit').then((response) => {
-        let keyInfo=response.data
-        //使用sessionStorage存储，
-        if(keyInfo){
-            console.log('获取到的公钥是',keyInfo)
-            sessionStorage.setItem("pKey",keyInfo)
-        }
-    }).catch(err=>{
-        console.log('出错',err)        
-    }) 
+    // this.$http.post('/sysInit').then((response) => {
+    //     let keyInfo=response.data
+    //     //使用sessionStorage存储，
+    //     if(keyInfo){
+    //         console.log('获取到的公钥是',keyInfo)
+    //         sessionStorage.setItem("pKey",keyInfo)
+    //     }
+    // }).catch(err=>{
+    //     console.log('出错',err)        
+    // }) 
   },
   methods:{
 

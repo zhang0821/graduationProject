@@ -77,11 +77,14 @@ export default {
             let info = {
                 compType:compType,
                 type: componentName,
-                width:e.target.offsetWidth,
-                height:e.target.offsetHeight,
+                width:300, //给通用组件设定一个最小默认值
+                height:80,
                 top:e.target.offsetY,
                 left:e.target.offsetX
             }
+            // if(compType !='node'){
+            //     console.log('此时不是拖拽节点！！！')
+            // }
             e.dataTransfer.setData('info', JSON.stringify(info))
         },
 

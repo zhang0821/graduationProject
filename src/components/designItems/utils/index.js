@@ -6,6 +6,6 @@ export default{
     nodesShow,
     fileUpload,
     warnBox,
-    textBox
+    textBox,
     
 }

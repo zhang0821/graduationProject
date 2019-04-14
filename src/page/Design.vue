@@ -39,14 +39,14 @@
 
                 <!-- 通用组件放置位置 -->
                 <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
-                    <text-box v-if="designStore.layoutInfo.textBox!=null" :detial-info="designStore.layoutInfo.textBox" :design="true" :dragstop-cb="onDragstop"/>
+                   
                     <!-- <drawing-board /> -->
-                    <div v-if="designStore.layoutInfo.title">
+                    <!-- <div v-if="designStore.layoutInfo.title!=null">
                         <input type="text" v-model="title"/>
                     </div>
-                    <div v-if="designStore.layoutInfo.subtitle">
+                    <div v-if="designStore.layoutInfo.subtitle!=null">
                         <input type="text" v-model="subtitle" />                   
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- 节点组件放置位置 -->
@@ -54,8 +54,14 @@
                     <componets-con :operate-type="'design'" :mouse-pos='getCurPos' :parent-drop="drop" ></componets-con>
                 </div>
 
+                <!-- 依次渲染组件名字 -->
+                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
+                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="true" :dragstop-cb="onDragstop" >
+                </component>
 
-                <loading v-if="isLoging" marginTop="-30%"></loading>
+               
+               
+               <loading v-if="isLoging" marginTop="-30%"></loading>
             </div>
 
             <!-- 图元信息配置模块 -->
@@ -90,7 +96,8 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             return {
                 usr:'',
                 isLoging:0,
-                mediaUpload:false
+                mediaUpload:false,
+                limitDragBox:['tm','bm','ml','mr']
             }
         },
         components:{
@@ -99,7 +106,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             componetsSet,
             loading,
             ...showItems,
-            ...utils
+            ...utils,
         },
         created() {
             if(this.$route.params.usr){
@@ -111,6 +118,8 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
         computed:{
             ...mapState({
                 designStore:state=>state,
+                layoutInfo:state=>state.layoutInfo,
+                testCom:state=>state.testCom
 
             }), 
             title:{
@@ -131,6 +140,13 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             }     
             
         },
+        watch:{
+            layoutInfo:function(old,newV){
+                // console.log('进入监听layoutInfo')
+                // console.log(old,'///new:',newV)
+                // this.$forceUpdate()
+            }
+        },
         methods: {          
             ...mapActions([
                 'imgUpLoad',
@@ -143,6 +159,8 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 'emptyState',
                 'deleteItem',
                 'undateNodesPos',
+                'updateLayout',
+                'delLayoutState',
                 'updateLayoutState'
             ]),
             showMediaUpload(){
@@ -152,7 +170,6 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             closeBox(){
                 this.mediaUpload=false
                 console.log('showUploadBox当前状态值',this.mediaUpload)
-
             },
             getCurPos(e){
                 console.log('外部鼠标坐标获取函数',e)
@@ -179,36 +196,40 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             },
             
             drop(e,curTab) { //松开拖放,e是容器元素
-                    console.log("info具体信息",e.dataTransfer.getData('info'))
+                
+                console.log("info具体信息",e.dataTransfer.getData('info'))
                 let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
                 //若此时没有初始化tab页，则也不允许节点元素被拖拽进入
                 //CODE视图的文字拖动也会触发此事件，这里屏蔽掉
                 if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                     return
+                let mouse=this.getCurPos(e)    
 
-                let mouse=this.getCurPos(e)                
-                if(info.compType == 'node' ){
-                    if(Object.keys(this.designStore.pageTabs).length < 0 || this.designStore.pageTabs[curTab].table.hasSet){//或者当前为表格页
+                if(info.compType == 'node' || info.type == 'table'){
+                    if(Object.keys(this.designStore.pageTabs).length <= 0){ //若无tab页面，不接受节点
                         return
                     }
-                    if(info.changePos){
-                        Object.assign(info,mouse)
-                        this.undateNodesPos(info)
-                    }else{
-                        let storeNode={
-                            tabIndex:curTab
+                    if(info.compType == 'node'){
+                        if(this.designStore.pageTabs[curTab].table.hasSet){//或者有tab页但当前页面设置为表格页
+                            return
                         }
-                        Object.assign(storeNode,mouse,info)
-                        console.log('存储元素',storeNode)
-                        this.addNodes(storeNode)
-                    }
-                    
-                }else{
-                    if(info.type == 'table'){
+                        if(info.changePos){
+                            Object.assign(info,mouse)
+                            this.undateNodesPos(info)
+                        }else{
+                            let storeNode={
+                                tabIndex:curTab
+                            }
+                            Object.assign(storeNode,mouse,info)
+                            console.log('存储元素',storeNode)
+                            this.addNodes(storeNode)
+                        }
+                    }else{
                         console.log('进入增加table到当前页')
                         this.updateTable(curTab)
                         return
                     }
+                }else{
                     let storeLayout={
                         [info.type]:{}
                     }
@@ -262,17 +283,43 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             },
             draw() {
             },
-            onDragstop(x,y) {
-                console.log('文本框停止拖拽后left和top',x,y)
+            onDragstop(obj){
+                //组件内操作完成后出发本父组件执行此函数
+                if(obj.remove){
+                    console.log('要删除的组件名称是：',obj.type)
+                     this.delLayoutState(obj.type) //删除该组件
+                     return
+                }
+                let updateLayout={
+                    [obj.type]:obj
+                }
+                console.log('updateLayout是：',updateLayout)
+                this.updateLayoutState(updateLayout)
+
             },
     
             /**预览 */
             preview() {
             },
-    
+
+            //判断当前设计信息是否满足所有必要条件
+            ifValidDesign(){
+                //1.是否所有tab页都拥有背景图
+                let flag=true
+                Object.keys(this.designStore.pageTabs).forEach(index=>{
+                    if(!this.designStore.pageTabs[index].imgload){
+                        alert('双击tab标签添加png图片！')
+                        flag=false
+                    }
+                })
+                return flag
+            },
             /**完成 */
             complete() {
                 // 提交信息到服务器
+                if(!this.ifValidDesign()){
+                    return
+                }
                 this.isLoging=1
                 this.postToServer({'usr':this.usr}).then((result) => {
                     console.log('数据提交后服务器返回结果',result)

@@ -15,7 +15,7 @@
                  :x="layoutInfo.warnBox.left" :y="layoutInfo.warnBox.top" :w="500" :h="100" :minh="30" :minw="50" :parent="true" >
                 <text-scroll-box ></text-scroll-box>
             </vue-draggable-resizable> -->
-            <warn-box v-if="layoutInfo.warnBox!=null" :detial-info="layoutInfo.warnBox" :design="true" :dragstop-cb="onDragstop"></warn-box>
+            <!-- <warn-box v-if="layoutInfo.warnBox!=null" :detial-info="layoutInfo.warnBox" :design="true" :dragstop-cb="onDragstop"></warn-box> -->
             
         </div>
         <!-- 文件上传组件 -->
@@ -160,9 +160,7 @@ export default {
         onResizing(x, y, width, height){
             console.log('onResizing!!x:y,width,height',x, y, width, height)
         },
-        onDragstop(left,top){
-            console.log('onDragstop!!x:y,width,height',left,top)
-        },
+        
         dragOver(e) {
             console.log('dragOver函数进入')
             e.preventDefault()

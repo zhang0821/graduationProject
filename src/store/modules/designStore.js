@@ -38,6 +38,7 @@ const state = {
         //     hasSet:0,
         // }
     },
+    
     /**保存每个页面节点信息 */
     pageTabs:{
         // 0:{
@@ -141,10 +142,13 @@ const mutations = {
     },
     /**修改tabi页是否有表格 */
     updateTable(state,index){
-        if(index!=null){
-            state.pageTabs[index].table.hasSet=true
-        }else{
-            state.pageTabs[index].table.hasSet=false
+        if(state.pageTabs[index]){
+            console.log('index:',state.pageTabs[index])
+            if(index!=null){
+                state.pageTabs[index].table.hasSet=true
+            }else{
+                state.pageTabs[index].table.hasSet=false
+            }
         }
     },
     /**删除页面节点 */
@@ -193,7 +197,9 @@ const mutations = {
                 name:'默认',
                 imgload:false,
                 designComponents:[],
-                isTable:false
+                table:{
+                    hasSet:false
+                }
             }
         }
     
@@ -252,15 +258,21 @@ const mutations = {
     },
     /**通用组件保存及资源上传 */
     updateLayoutState(state,obj){
-        console.log('上传文件好偶更新layout状态，上传的obj是',obj)
         if(obj.type == 'img'){
             state.pageTabs[obj.val].imgload=true
         }else if(obj.type == 'media'){
             state.layoutInfo.fireMusic=obj.val
         }else{
-            state.layoutInfo=Object.assign({},state.layoutInfo,obj)
-            console.log('当前layoutInfo值为',state.layoutInfo)
+            state.layoutInfo=Object.assign({},state.layoutInfo,obj) //第一次增加组件//objcet.assign无法实现深拷贝 //此处下一合并，键值会有丢失
+            console.log('修改后当前layoutInfo值为',state.layoutInfo)
         }
+    },
+    /**删除通用组件 */
+    delLayoutState(state,name){
+        console.log('进入组件删除函数：',name)
+        state.layoutInfo[name]=null
+        delete state.layoutInfo[name]
+        console.log('删除组件后layout内容是：',state.layoutInfo)
     },
 
     /**

@@ -2,26 +2,35 @@
     <div class="mainPage">
            
         <div class="header">
-    
             <div class="title">
-                <h1 ref="h1" v-if="designStore.layoutInfo.title">{{designStore.layoutInfo.title}}</h1>
-                <h4 v-if="designStore.layoutInfo.subtitle">{{designStore.layoutInfo.subtitle}}</h4>
+                <!-- <h1 ref="h1" v-if="designStore.layoutInfo.title">{{designStore.layoutInfo.title}}</h1>
+                <h4 v-if="designStore.layoutInfo.subtitle">{{designStore.layoutInfo.subtitle}}</h4> -->
             </div>
         	<audio v-if="designStore.layoutInfo.fireMusic && myaudio!=null"  hidden :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" ref="audioRef" controls="controls"  id="music"  loop="loop"   preload="auto">
             </audio>
         </div>
+
+
         <div class="designCon">
             <div class="nodePosInfo">
                 <componets-con :operate-type="'show'"></componets-con>
             </div>
             <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
         </div>
-          
-        <!-- <div class="warnScroll"> -->
-            <warn-box  v-if="designStore.layoutInfo.warnBox" :detial-info="designStore.layoutInfo.warnBox" :design="false" :dragstop-cb="(x,y)=>{}"></warn-box>
-        <!-- </div> -->
-      <div @click="goDesign" class="goDesign">design</div>
-      <my-mqtt :username="usr"></my-mqtt>
+
+        <!-- 通用组件渲染 -->
+
+        <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
+                    :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="false" :dragstop-cb="(obj)=>{}" >
+        </component>
+
+
+        <!-- 切换到组态设计入口 -->
+        <div @click="goDesign" class="goDesign">design</div>
+
+        <!-- 后端通信模块 -->
+        <my-mqtt :username="usr"></my-mqtt>
+
     </div>
 </template>
 <script>

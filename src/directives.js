@@ -4,8 +4,15 @@ import Vue from 'vue'
 // v-dialogDragWidth: 弹窗宽度拖大 拖小
 Vue.directive('resizable', {
     bind(el, binding) {
-        const value =binding.expression //传入的值
-        // console.log('此次指令引用传入的值是',value)
+        const value= binding.expression //传入的值
+        console.log('此次指令引用传入的值是',value)
+
+        const obj=binding.value
+        console.log('传入的value是：',obj)
+        let XYCallback={
+            w:null,
+            h:null
+        }
         el.onmousedown = (e) => {
             
             // 鼠标按下，计算当前元素距离可视区的距离
@@ -19,6 +26,13 @@ Vue.directive('resizable', {
                 // 通过事件委托，计算移动的距离 
                 // let w = e.clientX - disX;
                 // let h = e.clientY - disY;
+
+                //鼠标也随之移动
+                // let l=e.clientX-disX
+                // let t=e.clientY-disY
+                // el.style.left=l+'px'
+                // el.style.top=t+'px'
+
                 let w = e.clientX - el.offsetLeft;
                 let h = e.clientY - el.offsetTop;
                 if(h<10){
@@ -29,14 +43,23 @@ Vue.directive('resizable', {
                 }
                 el.style.width = `${w}px`
                 el.style.height = `${h}px`
+                //保存这个宽高
+                XYCallback.w=w
+                XYCallback.h=h
+                obj.fn.call(null,XYCallback)
             };
-
             document.onmouseup = function (e) {
+             
+                // obj.fn.call(null,'hello')
+                obj.fn.call(null,XYCallback)
                 document.onmousemove = null
                 document.onmouseup = null
             };
         }  
-    }
+    },
+    // update(el,bind){
+    //     fn.call(null,el)
+    // }
 })
 Vue.directive('focus', {
     // 当被绑定的元素插入到 DOM 中时……
@@ -52,6 +75,7 @@ Vue.directive('location', {
         // console.log('此次指令引用传入的值是',value)
         //https://www.cnblogs.com/moqiutao/p/8334780.html
         console.log('传入的绑定参数是：',binding.value)
+        //传入designStore?
         
     }
 })
