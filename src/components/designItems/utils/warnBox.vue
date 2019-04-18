@@ -1,8 +1,8 @@
 <template>
-<vue-draggable-resizable   drag-handle=".marquee_title" :resizable="design"  :draggable="design"  @dragstop="dragStop"
+<vue-draggable-resizable   drag-handle=".marquee_title" :resizable="design"  :draggable="design"  @dragstop="dragStop" @dragging="onDragging"
                  :x="detialInfo.left" :y="detialInfo.top" :w="styleDynamic.width" :h="styleDynamic.height" :minh="30" :minw="500"  >
 
-     <div class="marquee">
+     <div class="marquee" ref="marquee">
         <div class="marquee_title" ref="queeHead">
             <span>报警消息</span>
         </div>
@@ -21,11 +21,16 @@
         <!-- <div class="forDrag" v-resizable="{type:'warnBox',fn:resizeFn}">
         </div> -->
     </div>
+
+    <toolbar v-if="design" :remove="remove"></toolbar>
 </vue-draggable-resizable>
+
+
 </template>
 
 <script>
 import {mapState} from 'vuex'
+import toolbar from './toolbar'
 export default {
     name:"warn-box",
     data(){
@@ -45,11 +50,18 @@ export default {
             type:Boolean,
             required: true,
             default:false
+        },
+        limit:{
+             type:Object,
         }
+    },
+    components:{
+        toolbar
     },
     created() {
         this.styleDynamic=this.detialInfo
-        console.log('报警框初始化的数据是：',this.detialInfo)
+        console.log('报警框初始化的数据是：',this.detialInfo,'元素移动限制位置限制是',this.limit)
+
         setInterval(this.showMarquee, 5000)
     },
     computed:{
@@ -85,6 +97,13 @@ export default {
             let returnObj=Object.assign(this.detialInfo,newObj)
             this.dragstopCb(returnObj)
         },
+        onDragging(left,top){
+            if(left<this.limit.leftLimit || top<this.limit){
+                 console.log(`现在元素的位置是：${this.$refs.marquee.style.left},距离上面的宽度：${this.$refs.marquee.style.top}`)
+            }
+           
+                
+        },
         resizeFn(obj){
             // console.log('warnBox中的resizeFn被调用！！！,返回的宽高数据是',JSON.stringify(obj),'此时detial的宽高是',JSON.stringify(this.detialInfo))
             // this.styleDynamic.width=this.detialInfo.width+obj.w
@@ -98,6 +117,14 @@ export default {
             let returnObj=Object.assign(this.detialInfo,newObj)
             this.dragstopCb(returnObj)
 
+        },
+        remove(){
+            console.log('warnBox中的remove北风调用')
+            let obj={
+                type:'warnBox',
+                remove:true
+            }
+            this.dragstopCb(obj)
         }
     }
 }

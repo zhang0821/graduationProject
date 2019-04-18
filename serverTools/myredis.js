@@ -1,5 +1,5 @@
 const redis = require('redis')
-
+const notify=require('./message')
 // bluebird.promisifyAll(redis)
 
 const redisClient=redis.createClient({ "host": "127.0.0.1", "port": "6379" });
@@ -8,7 +8,7 @@ const redisClient=redis.createClient({ "host": "127.0.0.1", "port": "6379" });
 redisClient.on('error', function (err) { console.log('errorevent - ' + redisClient.host + ':' + redisClient.port + ' - ' + err); });
 
 // 清空相关数据
-redisClient.del('onlineC','ONLINE')
+// redisClient.del('onlineC','ONLINE') //只有npm run app的时候运行一次
 
 
 
@@ -67,6 +67,52 @@ let redisObj={
                     reject(err)
                 }
             })
+        })
+    },
+    //判断上次报警时间，查看是否发出报警
+    ifSendWarnMail(areaName,minutes){
+        return new Promise((resolve,reject)=>{
+            redisClient.hget('warn_record',areaName,function(err,res){
+                let nowObj={
+                    lastTime:(new Date()).getTime()
+                }
+                if(err){
+                    reject(err)
+                }
+                if(res){
+                    let lastTime =(JSON.parse(res)).lastTime
+                    let nowTime=nowObj.lastTime
+                    if((nowTime - lastTime)> 1000*60*minutes){
+                        console.log('现在比之前时间差大，',minutes,'分钟之前的时间是：',new Date(lastTime))
+                        redisClient.hset('warn_record',areaName,JSON.stringify(nowObj))
+                        resolve(1)//'要报警时间'
+                    }
+                    resolve(0)//'不报警'
+                }else{
+                    redisClient.hset('warn_record',areaName,JSON.stringify(nowObj))
+                    resolve(1)
+                    //之前未报警过，直接进行报警并将报警时间插入
+                }
+            })
+        });
+    },
+    mailCallback(area,text='默认',minutes=10){
+        redisObj.ifSendWarnMail(area,minutes).then((data)=>{
+            console.log('邮件操作返回的数据是：',data)
+            if(data==1){
+                console.log('践行报警服务')
+                return redisObj.usrSearch(area)
+            }else{
+                return Promise.resolve(null)
+            }
+        }).then((usrInfo)=>{
+            if(usrInfo){
+                console.log('是否查找用户返回,要进行报警',typeof usrInfo)
+                notify.sendMail(usrInfo.email,text)    
+                // notify.SendMessage(usrInfo.tel,'报警',text)
+            }else{
+                console.log('说明并不进行报警',usrInfo)
+            }
         })
     },
     //新增用户
@@ -187,5 +233,6 @@ let redisObj={
         })
     }
 }
+// redisObj.mailCallback('phy','告警信息',1)
 
 module.exports = redisObj

@@ -1,6 +1,7 @@
 <template>
 <vue-draggable-resizable  drag-handle='.icon' :resizable="design"  :draggable="design" @dragstop="dragStop" @dragging="onDragging"
-                 :x="detialInfo.left" :y="detialInfo.top" :w="detialInfo.width" :h="detialInfo.height" :minh="30" :minw="50" :parent="true" >
+                 :x="detialInfo.left" :y="detialInfo.top" :w="detialInfo.width" :h="detialInfo.height" 
+                 :minh="30" :minw="50" :parent="true" :handles="['br']">
      <div class="dragtestBox">
         
         <section v-if="design && notSave">
@@ -15,6 +16,9 @@
         </section>
        
     </div>
+
+    <!-- <toolbar v-if="design" :remove="remove" :edit="edit" :save="save" :font-size-down="fontSizeDown" :font-size-up="fontSizeUp"></toolbar> -->
+
     <div class="icon" ref="icon" v-if="design==true">
         <i @click="fontSizeUp">+</i>
         <i @click="fontSizeDown">-</i>
@@ -26,6 +30,7 @@
 </template>
 <script>
 import { setTimeout } from 'timers';
+import toolbar from './toolbar'
 export default {
     data(){
         return {
@@ -47,25 +52,34 @@ export default {
         design:{
             type:Boolean,
             default:false
+        },
+        limit:{
+             type:Object,
         }
     },
     created(){
         console.log('初始化进入textBox',this.detialInfo)
         
     },
+    components:{
+        toolbar
+    },
     methods:{
         dragStop(x,y){
-            
            let obj={
                left:x,
                top:y
            }  
+           if(this.design && !this.notSave){
+              this.save(obj) 
+           }
            
         },
         onDragging(){
             // this.notSave=true
         },
         fontSizeUp(){
+            // this.notSave=true
             if(!this.saveObj.text)
                 return
             let num=parseInt(this.saveObj.fontSize)
@@ -74,9 +88,11 @@ export default {
                 num=40
             }
             this.saveObj.fontSize=num+'px'
+            console.log(`尺寸+++${ this.saveObj.fontSize}`)
             this.save(this.saveObj)
         },
         fontSizeDown(){
+            // this.notSave=true
             if(!this.saveObj.text)
                 return
             let num=parseInt(this.saveObj.fontSize)
@@ -85,6 +101,7 @@ export default {
                 num=10
             }
             this.saveObj.fontSize=num+'px'
+            console.log(`尺寸-----${ this.saveObj.fontSize}`)
             this.save(this.saveObj)
 
         },
@@ -118,7 +135,6 @@ export default {
                 height:obj.h
             }
             this.save(newObj)
-
         }
     }
 }
@@ -144,8 +160,9 @@ export default {
     .text{
         width: 100%;
         height: 100%;
-        background: #000;
-        color: red;
+        color: #000;
+        // background: #000;
+        // color: red;
     }
 
 }

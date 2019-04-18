@@ -70,6 +70,7 @@
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
     "url-loader": "^0.5.8",
+    "urlencode": "^1.1.0",
     "vue-draggable-resizable": "^2.0.0-rc1",
     "vue-loader": "^13.3.0",
     "vue-socket.io": "^3.0.4",

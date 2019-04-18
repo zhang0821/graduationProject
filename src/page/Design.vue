@@ -35,7 +35,7 @@
             </div>
 
 
-            <div class="designCon">
+            <div class="designCon" ref="compContainer">
 
                 <!-- 通用组件放置位置 -->
                 <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
@@ -55,9 +55,13 @@
                 </div>
 
                 <!-- 依次渲染组件名字 -->
-                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
-                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="true" :dragstop-cb="onDragstop" >
-                </component>
+                <!-- <div v-if="finishParse"> -->
+                    <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
+                                :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
+                                :design="true" :dragstop-cb="onDragstop" >
+                    </component>
+                <!-- </div> -->
+                
 
                
                
@@ -96,8 +100,14 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             return {
                 usr:'',
                 isLoging:0,
+                finishParse:false,
                 mediaUpload:false,
-                limitDragBox:['tm','bm','ml','mr']
+                DragBoxInfo:{
+                    topLimit:0,
+                    leftLimit:0,
+                    width:0,
+                    height:0
+                }
             }
         },
         components:{
@@ -113,6 +123,19 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 this.usr=this.$route.params.usr
             }else{
                 this.usr=this.$store.state.dataTrans.username
+            }
+        },
+        mounted(){
+            this.DragBoxInfo.topLimit=this.$refs.compContainer.getBoundingClientRect().top
+            this.DragBoxInfo.leftLimit=this.$refs.compContainer.getBoundingClientRect().left
+            this.DragBoxInfo.width=this.$refs.compContainer.clientWidth
+            this.DragBoxInfo.height=this.$refs.compContainer.clientHeight
+            this.finishParse=true
+            window.onresize = () => { 
+                this.$nextTick(()=>{ //也可在mounted中执行
+                   this.DragBoxInfo.width=this.$refs.compContainer.clientWidth
+                   this.DragBoxInfo.height=this.$refs.compContainer.clientHeight
+                })
             }
         },
         computed:{
@@ -195,7 +218,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 }
             },
             
-            drop(e,curTab) { //松开拖放,e是容器元素
+            drop(e,curTab=0) { //松开拖放,e是容器元素
                 
                 console.log("info具体信息",e.dataTransfer.getData('info'))
                 let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
@@ -247,7 +270,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                     return
                 console.log('目前放置到通用组件位置的元素是',info)  
                 let storeLayout={
-                    [info.type]:' '
+                    [info.type]:{}
                 }
                 Object.assign(storeLayout[info.type],mouse,info)
                 console.log('通用组件保存信息是',storeLayout)
@@ -290,6 +313,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                      this.delLayoutState(obj.type) //删除该组件
                      return
                 }
+                //!!将宽高坐标转化成相对的
                 let updateLayout={
                     [obj.type]:obj
                 }

@@ -91,7 +91,7 @@ export default {
       this.goDesign()
    
    
-   //发起请求，获取公钥私钥。
+//    发起请求，获取公钥私钥。
     // this.$http.post('/sysInit').then((response) => {
     //     let keyInfo=response.data
     //     //使用sessionStorage存储，
