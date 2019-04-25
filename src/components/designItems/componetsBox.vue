@@ -34,21 +34,9 @@
                 
             </ul>
 
-            <ul class="components-list common" v-if="this.UItype==='通用组件'">
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='warnBox'>报警框</div>
-                </li> 
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='table'>数据表格</div>
-                </li> 
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='textBox'>文本框</div>
-                </li>
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='title'>一级标题</div>
-                </li>
-                <li>
-                    <div draggable="true" @dragstart="dragStart" comp-type="common" data-name='subtitle'>二级标题</div>
+            <ul class="components-list common" v-if="this.UItype==='通用组件'" >
+                <li v-for="(comp,index) in comList">
+                    <div draggable="true" @dragstart="dragStart" comp-type="common" :data-name="comp.compType">{{comp.compname}}</div>
                 </li>
             </ul>
         </div>
@@ -66,7 +54,29 @@ export default {
         return {
             showDropMenu:0,
             childMenu:1,
-            UItype:'布局'
+            UItype:'布局',
+            comList:[
+                {
+                    compType:'warnBox',
+                    compname:'报警框'
+                },
+                {
+                    compType:'table',
+                    compname:'数据表格'
+                },
+                {
+                    compType:'textBox',
+                    compname:'文本框'
+                },
+                {
+                    compType:'title',
+                    compname:'标题'
+                },
+                {
+                    compType:'subtitle',
+                    compname:'子标题'
+                },
+            ]
         }
     },
 

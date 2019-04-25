@@ -55,12 +55,10 @@
                 </div>
 
                 <!-- 依次渲染组件名字 -->
-                <!-- <div v-if="finishParse"> -->
-                    <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
-                                :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
-                                :design="true" :dragstop-cb="onDragstop" >
-                    </component>
-                <!-- </div> -->
+                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
+                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
+                            :design="true" :dragstop-cb="onDragstop" >
+                </component>
                 
 
                
@@ -341,9 +339,17 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             /**完成 */
             complete() {
                 // 提交信息到服务器
-                if(!this.ifValidDesign()){
-                    return
-                }
+
+                //使用数组方法
+               let ifValidDesign=Object.keys(this.designStore.pageTabs).every((item,index,arr)=>{
+                   return this.designStore.pageTabs[item].imgload
+               })
+               console.log(`检查tab页是否图片齐全的返回值是${ifValidDesign}`)
+               if(!ifValidDesign)
+                return
+                // if(!this.ifValidDesign()){
+                //     return
+                // }
                 this.isLoging=1
                 this.postToServer({'usr':this.usr}).then((result) => {
                     console.log('数据提交后服务器返回结果',result)

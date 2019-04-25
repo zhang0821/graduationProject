@@ -60,7 +60,7 @@ export default {
     data(){
         return {
             /**tab页背景图片地址 */
-            imgburl:"/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab",
+            imgburl:`/static/userUpload/${this.$store.state.dataTrans.username}/bgImgOftab`,
             dynamicImgUrl:[],
             showType: '预览',
             curTab:'0',
@@ -88,9 +88,8 @@ export default {
        Object.keys(this.tabArr).forEach(index=>{
             console.log('进入图片预览。当前index是',index)           
            if(this.tabArr[index].imgload){
-               console.log('遍历对象后，此时的index',index)
-               this.dynamicImgUrl[index] ="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+index+'.png?hah=hah'
-            //    this.dynamicImgUrl[index] ="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+index+'.png'
+            //    this.dynamicImgUrl[index] ="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+index+'.png?hah=hah'
+               this.dynamicImgUrl[index] =`/static/userUpload/${this.$store.state.dataTrans.username}/bgImgOftab${index}.png?hah=hah`
            }
            if(this.tabArr[index].table.hasSet){
                this.dynamicImgUrl[index]=null
@@ -145,29 +144,13 @@ export default {
 
         }),
         dragStart(e){
-            // let info = {
-            //     compType:'common',
-            //     type:'warnBox',
-            //     changePos:true,
-
-            //     width:e.target.offsetWidth,
-            //     height:e.target.offsetHeight,
-
-            // } 
-            // console.log('报警框再次拖拽事件')
-            // e.dataTransfer.setData('info', JSON.stringify(info))
-        },
-        onResizing(x, y, width, height){
-            console.log('onResizing!!x:y,width,height',x, y, width, height)
-        },
-        
+        },        
         dragOver(e) {
-            console.log('dragOver函数进入')
             e.preventDefault()
         },
         drop(e) { //松开拖放,e是容器元素
          console.log("info具体信息",e.dataTransfer.getData('info'))
-        this.parentDrop(e,this.curTab)
+         this.parentDrop(e,this.curTab)
 
         //     let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
         //     //若此时没有初始化tab页，则也不允许节点元素被拖拽进入
@@ -215,7 +198,6 @@ export default {
         },
         /**双击添加背景图片 */
         fileLoad(tabIndex){
-            console.log('tab页面：',tabIndex,'执行双击函数')
             this.showUploadBox=true
         },
         /**文件上传完成够组件传递的回调 */
@@ -223,7 +205,8 @@ export default {
             console.log('文件传输完成，关闭文件传输框')
             this.showUploadBox=false
             //并加载当前tab页背景图为刚才上传的背景图
-            this.dynamicImgUrl[this.curTab]="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+this.curTab+".png?date="+(new Date()).getTime()
+            this.dynamicImgUrl[this.curTab]=`/static/userUpload/${this.$store.state.dataTrans.username}/bgImgOftab${this.curTab}.png?date=${(new Date()).getTime()}`
+            // this.dynamicImgUrl[this.curTab]="/static/userUpload/"+this.$store.state.dataTrans.username+"/bgImgOftab"+this.curTab+".png?date="+(new Date()).getTime()
             this.$forceUpdate()
         }
     },

@@ -111,7 +111,7 @@ const mutations = {
         if(obj.tabIndex){
             tabIndex=obj.tabIndex
         }
-        if(!obj.id){//说明此处在拖拽节点
+        if(!obj.id){//说明此处在拖拽节点   
             Object.assign(obj,{
                 id:state.pageTabs[tabIndex].designComponents.length
             })
