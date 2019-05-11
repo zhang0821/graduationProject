@@ -1,28 +1,30 @@
 <template>
     <div class="mainPage">
-           
-        <div class="header">
-            <div class="title">
-                <!-- <h1 ref="h1" v-if="designStore.layoutInfo.title">{{designStore.layoutInfo.title}}</h1>
-                <h4 v-if="designStore.layoutInfo.subtitle">{{designStore.layoutInfo.subtitle}}</h4> -->
-            </div>
-        	<audio v-if="designStore.layoutInfo.fireMusic && myaudio!=null"  hidden :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" ref="audioRef" controls="controls"  id="music"  loop="loop"   preload="auto">
+            <audio v-if="designStore.layoutInfo.fireMusic && myaudio!=null"  hidden :src="'/static/userUpload/'+usr+'/fireMusic.mp3'" ref="audioRef" controls="controls"  id="music"  loop="loop"   preload="auto">
             </audio>
-        </div>
 
-
-        <div class="designCon">
-            <div class="nodePosInfo">
-                <componets-con :operate-type="'show'"></componets-con>
+           <div class="header" v-if="designStore.layoutInfo.layoutConTopHeight != 0" :style="{height: `${designStore.layoutInfo.layoutConTopHeight}px`}">
+                显示上header
+                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object' && designStore.layoutInfo[cmp].position == 'top'" 
+                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="false" :dragstop-cb="(obj)=>{}" >
+                </component>
+           </div>
+       
+            <div class="designCon">
+                <div class="nodePosInfo">
+                    <componets-con :operate-type="'show'"></componets-con>
+                </div>
+                <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
             </div>
-            <!-- <loading v-if="isLoging" marginTop="-30%"></loading> -->
-        </div>
 
-        <!-- 通用组件渲染 -->
+            <div class="header" v-if="designStore.layoutInfo.layoutConBottomHeight!=0" :style="{height: `${designStore.layoutInfo.layoutConBottomHeight}px`}">
+                显示下header
+                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object' && designStore.layoutInfo[cmp].position == 'bottom'" 
+                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="false" :dragstop-cb="(obj)=>{}" >
+                </component>
+            </div>
 
-        <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
-                    :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]" :design="false" :dragstop-cb="(obj)=>{}" >
-        </component>
+        
 
 
         <!-- 切换到组态设计入口 -->
@@ -120,18 +122,24 @@ import { mapState, mapActions, mapMutations } from 'vuex';
     width: 100%;
     height: 100%;
     position: absolute;
-    background: #699;
+    // background: #699;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-image: url('../assets/sky2.png');
     display: flex;
     flex-direction: column;
+    audio{
+        height: 0;
+    }
     .header{
         width: 100%;
-        height: 100px;
-        background: #000;
-        .title{
-            text-align: center;
-            line-height: 100px;color: #fff;padding: 0 10px;
-            // margin-left:auto;margin-right: auto;
-        }
+        // height: 100px;
+        // background: #000;
+        // .title{
+        //     text-align: center;
+        //     line-height: 100px;color: #fff;padding: 0 10px;
+        //     // margin-left:auto;margin-right: auto;
+        // }
     }
     .designCon{
         flex:1;

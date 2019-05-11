@@ -10,7 +10,7 @@
             <ul class="marquee_list" :class="{marquee_top:animate}">
                 <li v-for="(item, index) in marqueeList">
                     <span>{{item.floor_id}}楼{{item.room_id}}房间</span>
-                    <span v-if="item.type == 'tem_hum'">温湿度传感器报警!当前温度：{{item.tempValue}},湿度：{{item.humiValue}}</span>
+                    <span v-if="item.type == 'tem_hum'">温湿度传感器报警!当前温度：{{item.temp_value}},湿度：{{item.humi_value}}</span>
                     <span v-else-if="item.type == 'smoke'">烟雾传感器报警</span>
                     <span v-else-if="item.type == 'door'">门禁传感器报警</span>
                     <span v-else-if="item.type == 'water'">水浸传感器报警</span>

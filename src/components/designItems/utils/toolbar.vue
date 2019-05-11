@@ -27,7 +27,8 @@ export default {
         width: 100%;
         background: #ccc;
         i{
-            display: inline-block;
+            // display: inline-block;
+            float: right;
             width: 20px;
             height: 20px;
             border: 1px solid #000;

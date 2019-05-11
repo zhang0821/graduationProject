@@ -11,10 +11,16 @@ Vue.directive('resizable', {
         console.log('传入的value是：',obj)
         let XYCallback={
             w:null,
-            h:null
+            h:null,
+            type:obj.type
         }
         el.onmousedown = (e) => {
             
+            // console.log('拖拽时相关信息：e.clientY:',e.clientY,'el.offsetTop:',el.offsetTop,'el.offsetHeight:',el.offsetHeight)
+            if((e.clientY-el.offsetTop) < (Math.floor(el.offsetHeight*8/10))){
+                console.log('此时不能拖动')
+                return
+            }
             // 鼠标按下，计算当前元素距离可视区的距离
             const disX = e.clientX - el.offsetLeft;
             const disY= e.clientY - el.offsetTop;
@@ -41,8 +47,19 @@ Vue.directive('resizable', {
                 if(w<10){
                     w=10
                 }
-                el.style.width = `${w}px`
-                el.style.height = `${h}px`
+                if(obj.styleLimit){
+                    if(obj.styleLimit.w){
+                        el.style.height = `${h}px`
+                    }
+                    if(obj.styleLimit.h){
+                        el.style.width = `${w}px`                        
+                    }
+                }else{
+                    el.style.width = `${w}px`
+                    el.style.height = `${h}px`
+                }
+                
+
                 //保存这个宽高
                 XYCallback.w=w
                 XYCallback.h=h

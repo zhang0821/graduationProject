@@ -29,10 +29,11 @@ const state = {
 
     /**页面tab页页数 */
     layoutInfo:{
-        // title:'请键入一级标题',
-        // subtitle:'请键入二级标题',
+        layoutConTopHeight:50,
+        layoutConBottomHeight:50,
         fireMusic:false,
-        offlineTimer:10,
+        offlineTimer1:60,
+        offlineTimer2:300, //60*5
         // warnBox:{}
         // warnBox:{
         //     hasSet:0,
@@ -185,9 +186,11 @@ const mutations = {
         } , 
         state.previewClick=0, 
         state.layoutInfo={
-            title:'请键入一级标题',
-            subtitle:'请键入二级标题',
+            layoutConTopHeight:50,
+            layoutConBottomHeight:50,
             fireMusic:false,
+            offlineTimer1:60,
+            offlineTimer2:600, //60*10
             // warnBox:{
             //     hasSet:0,
             // }
@@ -274,6 +277,17 @@ const mutations = {
         delete state.layoutInfo[name]
         console.log('删除组件后layout内容是：',state.layoutInfo)
     },
+    /**delLayoutCon删除 */
+    delLayoutConTop(state){
+        // console.log('要删除的layoutConTopHeight')
+        state.layoutInfo.layoutConTopHeight = 0
+    },
+    delLayoutConBottom(state){
+        // console.log('要删除的delLayoutConBottom')
+        state.layoutInfo.layoutConBottomHeight = 0
+
+
+    },
 
     /**
      *与后台数据传输相关 
@@ -304,9 +318,17 @@ const mutations = {
          if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']){
              clearTimeout(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
          }
+
          let timeOutTimer=setTimeout(()=>{
-             state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
-         },state.layoutInfo.offlineTimer*1000)
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+        },state.layoutInfo.offlineTimer1*1000)
+
+         if(obj.type == 'smoke'){
+            timeOutTimer=setTimeout(()=>{
+                state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+            },state.layoutInfo.offlineTimer2*1000)
+         }
+        
          state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
          console.log('下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
         
@@ -319,11 +341,21 @@ const mutations = {
         if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']){
             clearTimeout(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
         }
-        let timeOutTimer=setTimeout(()=>{
-            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
-        },20*1000)
-        state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
-        console.log('下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+        // let timeOutTimer=setTimeout(()=>{
+        //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+        // },30*1000)        
+        // state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
+        if(obj.type == 'smoke'){
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=setTimeout(()=>{
+                state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+            },state.layoutInfo.offlineTimer2*1000)
+        }else{
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=setTimeout(()=>{
+                state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+            },state.layoutInfo.offlineTimer1*1000)
+        }
+
+        console.log('节点状态变更处理函数中打印，下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
 
     }
 }

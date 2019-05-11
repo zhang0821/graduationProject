@@ -23,15 +23,15 @@
                                     left:(Math.round(item.posx*sensorContainerWidth,2))-20+'px',
                                     }" >
                                     <section v-if="item.type == 'tem_hum'">
-                                        <i v-if="item.temp">{{item.temp}}<br>{{item.humi}}</i>
-                                        <i v-else>{{item.dev_eui}}</i>
+                                        <i v-if="item.temp_value">{{item.temp_value}}<br>{{item.humi_value}}</i>
+                                        <i v-else>{{item.room_id}}</i>
                                     </section>
                                     <section v-else-if="item.type == 'air'">
                                         <i v-if="item.nh4">{{item.nh4}}<br>{{item.h2s}}</i>
-                                        <i v-else>{{item.dev_eui}}</i>
+                                        <i v-else>{{item.room_id}}</i>
                                     </section>
                                     <section v-else>
-                                        <i v-if="!item.status">{{item.dev_eui}}</i>
+                                        <i v-if="!item.status">{{item.room_id}}</i>
                                     </section>
 
                                     <div v-if="listenNodesChange%2 == 0">
@@ -180,7 +180,7 @@ export default {
         })
       }
        this.sensorContainerWidth=this.$refs.sensorparsebox.clientWidth
-             this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
+        this.sensorContainerHeight=this.$refs.sensorparsebox.clientHeight
     },
     destroyed() {
         

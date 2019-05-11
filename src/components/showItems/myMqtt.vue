@@ -14,7 +14,7 @@ export default {
   data() {
     return {
       // wsuri:'ws://localhost:8080/infos',
-      wsuri:'ws://10.149.65.187:8080',
+      wsuri:'ws://localhost:8080',
       SocketInstance:'',
     }
   },
@@ -42,7 +42,7 @@ export default {
       // // Send the "pingServer" event to the server.
       // this.$socket.emit('pingServer', 'PING!')
     },
-    ping(interval=5){
+    ping(interval=30){
         setInterval(()=>{
             this.SocketInstance.emit('myPing',this.SocketInstance.id)
         },interval*1000)

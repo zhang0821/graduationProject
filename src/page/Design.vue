@@ -38,30 +38,51 @@
             <div class="designCon" ref="compContainer">
 
                 <!-- 通用组件放置位置 -->
-                <div class="layoutInfo" @dragover.prevent  @drop="layoutDrop">
-                   
-                    <!-- <drawing-board /> -->
-                    <!-- <div v-if="designStore.layoutInfo.title!=null">
-                        <input type="text" v-model="title"/>
+                <div  v-if="designStore.layoutInfo.layoutConTopHeight != 0" >
+                    <div class="layoutCon" ref="layoutConTop" @dragover.prevent  @drop="layoutDropTop" 
+                            v-resizable="{type:'layoutConTop',styleLimit:{w:true},fn:conResizeFn}">
+                        <!-- 依次渲染通用组件名字 -->
+                        <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object' && designStore.layoutInfo[cmp].position == 'top'" 
+                                    :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
+                                    :design="true" :dragstop-cb="onDragstop" >
+                        </component>
+                        <!-- <drawing-board /> -->
+                        <!-- <div v-if="designStore.layoutInfo.title!=null">
+                            <input type="text" v-model="title"/>
+                        </div>
+                        <div v-if="designStore.layoutInfo.subtitle!=null">
+                            <input type="text" v-model="subtitle" />                   
+                        </div> -->
                     </div>
-                    <div v-if="designStore.layoutInfo.subtitle!=null">
-                        <input type="text" v-model="subtitle" />                   
-                    </div> -->
+                    <toolbar v-if="true" :remove="delLayoutConTop"></toolbar>
                 </div>
+               
 
                 <!-- 节点组件放置位置 -->
                 <div class="nodePosInfo" ref="nodeCon" > 
                     <componets-con :operate-type="'design'" :mouse-pos='getCurPos' :parent-drop="drop" ></componets-con>
                 </div>
 
-                <!-- 依次渲染组件名字 -->
-                <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
-                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
-                            :design="true" :dragstop-cb="onDragstop" >
-                </component>
+
+                <div v-if="designStore.layoutInfo.layoutConBottomHeight != 0">
+                    <div class="layoutCon" ref="layoutConBottom" @dragover.prevent  @drop="layoutDropBottom" 
+                            v-resizable="{type:'layoutConBottom',styleLimit:{w:true},fn:conResizeFn}">
+                        <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object' && designStore.layoutInfo[cmp].position == 'bottom'" 
+                                    :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
+                                    :design="true" :dragstop-cb="onDragstop" >
+                        </component>
+                    </div>
+                    <toolbar v-if="true" :remove="delLayoutConBottom"></toolbar>
+                </div>
                 
 
-               
+
+                <!-- 依次渲染通用组件名字 -->
+                <!-- <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object'" 
+                            :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
+                            :design="true" :dragstop-cb="onDragstop" >
+                </component> -->
+                            
                
                <loading v-if="isLoging" marginTop="-30%"></loading>
             </div>
@@ -182,7 +203,10 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 'undateNodesPos',
                 'updateLayout',
                 'delLayoutState',
-                'updateLayoutState'
+                'updateLayoutState',
+                'delLayoutConTop',
+                'delLayoutConBottom',
+                
             ]),
             showMediaUpload(){
                 this.mediaUpload=true
@@ -225,7 +249,6 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                     return
                 let mouse=this.getCurPos(e)    
-
                 if(info.compType == 'node' || info.type == 'table'){
                     if(Object.keys(this.designStore.pageTabs).length <= 0){ //若无tab页面，不接受节点
                         return
@@ -251,22 +274,26 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                         return
                     }
                 }else{
-                    let storeLayout={
-                        [info.type]:{}
-                    }
-                    Object.assign(storeLayout[info.type],mouse,info)
-                    console.log('drop组件保存信息是',storeLayout)
-                    this.updateLayoutState(storeLayout)
+                    //通用组建进入：
+                    return
+                    // let storeLayout={
+                    //     [info.type]:{}
+                    // }
+                    // Object.assign(storeLayout[info.type],mouse,info)
+                    // console.log('drop组件保存信息是',storeLayout)
+                    // this.updateLayoutState(storeLayout)
                 }
             },
             /**通用控件放置处 */
-            layoutDrop(e){
+            layoutDropTop(e){
                 console.log('当前元素位置信息：')
-                 let mouse=this.getCurPos(e)
+                let mouse=this.getCurPos(e)
                 let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
                 if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
                     return
-                console.log('目前放置到通用组件位置的元素是',info)  
+
+                info['position']  = 'top'                
+                console.log('目前放置到通用组件位置的元素是',info)
                 let storeLayout={
                     [info.type]:{}
                 }
@@ -275,6 +302,26 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 this.updateLayoutState(storeLayout)
 
             },
+            layoutDropBottom(e){
+                let mouse=this.getCurPos(e)
+                let info = JSON.parse(e.dataTransfer.getData('info')) //获取拖拽暂存的数据
+                if (e.target.className.indexOf('sound-code') !== -1 || e.target.className.indexOf('hljs') !== -1)
+                    return
+
+                info['position']  = 'bottom'                
+                console.log('目前放置到通用组件位置的元素是',info)  
+                let storeLayout={
+                    [info.type]:{}
+                }
+                Object.assign(storeLayout[info.type],mouse,info)
+                console.log('通用组件保存信息是',storeLayout)
+                this.updateLayoutState(storeLayout)
+            },
+            //**外部容器框大小改变 */
+            conResizeFn(obj){
+                // this.$refs.layoutCon.clientWidth=obj.w
+                 this.$refs[obj.type].style.height=obj.h
+             },
             /**回收站*/
             
             dragover(e){
@@ -302,6 +349,12 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 }
             
             },
+            // delLayoutConTop(){
+            //     console.log('要删除的layoutConTopHeight')
+            // },
+            // delLayoutConBottom(){
+
+            // },
             draw() {
             },
             onDragstop(obj){
@@ -448,11 +501,11 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             // background:rgb(139 , 180, 192);
             display: flex;
             flex-direction: column;
-            .layoutInfo{
+            .layoutCon{
                 width: 100%;
                 height: auto;
-                min-height: 100px;
-                // background: #ccc;
+                min-height: 50px;
+                background: #999;
             }
             .nodePosInfo{
                 width: 100%;
