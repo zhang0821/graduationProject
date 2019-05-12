@@ -144,7 +144,7 @@ import { mapState, mapActions, mapMutations } from 'vuex';
     .designCon{
         flex:1;
         width: 100%;
-        background:rgb(139 , 180, 192);
+        // background:rgb(139 , 180, 192);
         display: flex;
         flex-direction: column;
         .nodePosInfo{
@@ -156,7 +156,7 @@ import { mapState, mapActions, mapMutations } from 'vuex';
     .warnScroll{
         width: 100%;
         height: 50px;
-        background: #ccc;
+        // background: #ccc;
     }
         
     
@@ -171,7 +171,7 @@ import { mapState, mapActions, mapMutations } from 'vuex';
   top:-30px;
   left:  calc(100%-40px);
 //   transform: translateX(-50%);
-  background: #fff;
+  color: #fff;
   &:hover{
     cursor: pointer;
     left: calc(100%-80px);

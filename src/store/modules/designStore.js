@@ -237,27 +237,36 @@ const mutations = {
 
     },
     /**布局tab页修改*/
-    updateLayout_tab(state,obj){
+    updateLayoutCon(state,obj){
         let curLen=Object.keys(state.pageTabs).length
-        if(obj.operate =='tab-icon-add'){
-            let tabObj={
-                [curLen]:{
-                    name:curLen,
-                    imgload:false,
-                    designComponents:[],
-                    table:{
-                        hasSet:false
+        if(obj.operate =='tab-icon-add' || obj.operate =='tab-icon-del'){
+            if(obj.operate =='tab-icon-add'){
+                let tabObj={
+                    [curLen]:{
+                        name:curLen,
+                        imgload:false,
+                        designComponents:[],
+                        table:{
+                            hasSet:false
+                        }
                     }
                 }
+                state.pageTabs=Object.assign({},state.pageTabs,tabObj) 
+                // console.log('增加属性后，当前pageTabs是',JSON.stringify(state.pageTabs))
+    
+            }else{
+                delete state.pageTabs[Object.keys(state.pageTabs)[curLen-1]] //删除最后一个元素
+                state.pageTabs=Object.assign({},state.pageTabs)  //避免不动态更新视图
+                // console.log('删除属性后，当前pageTabs是',JSON.stringify(state.pageTabs))
             }
-            state.pageTabs=Object.assign({},state.pageTabs,tabObj) 
-            console.log('增加属性后，当前pageTabs是',JSON.stringify(state.pageTabs))
-
-        }else{
-            delete state.pageTabs[Object.keys(state.pageTabs)[curLen-1]] //删除最后一个元素
-            state.pageTabs=Object.assign({},state.pageTabs)  //避免不动态更新视图
-            console.log('删除属性后，当前pageTabs是',JSON.stringify(state.pageTabs))
         }
+        if(obj.operate == 'header_add' &&  state.layoutInfo.layoutConTopHeight==0){
+            state.layoutInfo.layoutConTopHeight=50
+        }
+        if(obj.operate == 'footer_add' &&  state.layoutInfo.layoutConBottomHeight==0){
+            state.layoutInfo.layoutConBottomHeight=50
+        }
+        
     },
     /**通用组件保存及资源上传 */
     updateLayoutState(state,obj){
@@ -288,7 +297,12 @@ const mutations = {
 
 
     },
-
+    modifyLConStyle(state,obj){
+        console.log('修改TOP和BOTTOM尺寸,传入的数据是：',obj)
+        let whichone=obj.type+'Height'
+        state.layoutInfo[whichone]=obj.h
+        console.log('此时修改后的layout值是：,',state.layoutInfo[whichone],state.layoutInfo)
+    },
     /**
      *与后台数据传输相关 
      */
@@ -302,35 +316,60 @@ const mutations = {
     },
     /**接收mqtt传来信息，更新全局存储节点的变量 */
     updateNodesList(state,obj){
-
         console.log('designStore接收mqtt数据被调用,数据是obj.tabIndex:',obj.tabIndex,'obj.nodeIndex:',obj.nodeIndex)
         
         state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=obj.status
+        
+        //如果是温湿度节点，要给该节点新增温湿度值
+        if(obj.type == 'tem_hum'){
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['temp_value']=obj.temp_value
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['humi_value']=obj.humi_value
+            // if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].temp_value){
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].temp_value=obj.temp_value
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].humi_value=obj.humi_value
+            // }else{
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['temp_value']=obj.temp_value
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['humi_value']=obj.humi_value
+            // }
+        }
+        if(obj.type == 'air'){
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['nh4']=obj.nh4
+            state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['h2s']=obj.h2s
+            // if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].nh4){
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].nh4=obj.nh4
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].h2s=obj.h2s
+            // }else{
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['nh4']=obj.nh4
+            //     state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['h2s']=obj.h2s
+            // }
+        }
         // this.commit('monitorNodesState',obj)
-        console.log('当前要被改变的节点的状态值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].status)
 
-
+        // console.log('当前要被改变的节点的状态值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex].status)
 
         //获取统计vuex中数据
-        console.log('designTrans中的报警信息是',designTrans.state.warnInfo)
+          console.log('designTrans中的报警信息是',designTrans.state.warnInfo)
          //设定定时器，转化为离线状态，若离线，则也要加入报警框提醒中
          console.log('目前该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+        
          if( state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']){
              clearTimeout(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
          }
 
          let timeOutTimer=setTimeout(()=>{
             state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+            console.log(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]+'的状态值在designTrans中清零')
         },state.layoutInfo.offlineTimer1*1000)
-
+        
          if(obj.type == 'smoke'){
             timeOutTimer=setTimeout(()=>{
                 state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['status']=null
+                console.log(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]+'编号的烟雾节点状态值在designTrans中清零')
             },state.layoutInfo.offlineTimer2*1000)
          }
-        
+         console.log(state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]+'编号的节点在designTrans中设置了定时器',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])        
          state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer']=timeOutTimer
-         console.log('下一步该元素的timer是：',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex]['timer'])
+         console.log('designStore中接收完mqtt数据后，该节点的所有值是',state.pageTabs[obj.tabIndex].designComponents[obj.nodeIndex])
         
     },
     /**节点状态变更处理函数 */

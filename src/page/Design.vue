@@ -44,7 +44,7 @@
                         <!-- 依次渲染通用组件名字 -->
                         <component v-for="(cmp,index) in Object.keys(designStore.layoutInfo)" :key="index"  v-if="typeof designStore.layoutInfo[cmp]=='object' && designStore.layoutInfo[cmp].position == 'top'" 
                                     :is="designStore.layoutInfo[cmp].type" :detial-info="designStore.layoutInfo[cmp]"  :limit="DragBoxInfo"
-                                    :design="true" :dragstop-cb="onDragstop" >
+                                    :design="true" :dragstop-cb="onDragstop">
                         </component>
                         <!-- <drawing-board /> -->
                         <!-- <div v-if="designStore.layoutInfo.title!=null">
@@ -206,6 +206,7 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                 'updateLayoutState',
                 'delLayoutConTop',
                 'delLayoutConBottom',
+                'modifyLConStyle'
                 
             ]),
             showMediaUpload(){
@@ -321,6 +322,8 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
             conResizeFn(obj){
                 // this.$refs.layoutCon.clientWidth=obj.w
                  this.$refs[obj.type].style.height=obj.h
+                 this.modifyLConStyle(obj)
+                 
              },
             /**回收站*/
             
@@ -365,6 +368,11 @@ const {mapState, mapMutations, mapActions } = createNamespacedHelpers('designSto
                      return
                 }
                 //!!将宽高坐标转化成相对的
+                obj.widthShow=(obj.width/this.$refs.compContainer.style.width).toFixed(4)
+                obj.heightShow=(obj.height/this.$refs.compContainer.style.height).toFixed(4)
+                obj.posy=((obj.top-100)/this.$refs.compContainer.style.height).toFixed(4)
+                obj.posx=((obj.left-100)/this.$refs.compContainer.style.width).toFixed(4)
+
                 let updateLayout={
                     [obj.type]:obj
                 }

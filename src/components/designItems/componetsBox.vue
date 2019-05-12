@@ -24,11 +24,17 @@
             </ul>
 
             <ul class="components-list layout" v-if="this.UItype==='布局'">
-                <li @click="layoutTab">
+                <li @click="layoutModify">
+                    <span>header</span><i class="header_add">+</i>
+                </li>
+                <li @click="layoutModify">
+                    <span>footer</span><i class="footer_add">+</i>
+                </li>
+                <li @click="layoutModify">
                     <span>增加tab页</span><i class="tab-icon-add">+</i>
                 </li>
 
-                <li @click="layoutTab">
+                <li @click="layoutModify">
                     <span>减少tab页</span><i class="tab-icon-del">-</i>
                 </li>
                 
@@ -69,12 +75,8 @@ export default {
                     compname:'文本框'
                 },
                 {
-                    compType:'title',
-                    compname:'标题'
-                },
-                {
-                    compType:'subtitle',
-                    compname:'子标题'
+                    compType:'container',
+                    compname:'图片容器'
                 },
             ]
         }
@@ -92,9 +94,6 @@ export default {
                 top:e.target.offsetY,
                 left:e.target.offsetX
             }
-            // if(compType !='node'){
-            //     console.log('此时不是拖拽节点！！！')
-            // }
             e.dataTransfer.setData('info', JSON.stringify(info))
         },
 
@@ -105,10 +104,10 @@ export default {
             this.$refs.typeName.innerHTML=e.target.innerHTML
         },
 
-        layoutTab(e){
+        layoutModify(e){
             let operate=e.target.className
             if(operate != ''){
-                this.$store.commit('designStore/updateLayout_tab',{operate})        
+                this.$store.commit('designStore/updateLayoutCon',{operate})        
             }
         }
     },
@@ -164,7 +163,7 @@ section{
     width: 100%;
     height: 100%;
     list-style: none;
-    padding: 10px 0;
+    padding: 10px 5px;
     li {
         cursor: move!important;
         width: auto;

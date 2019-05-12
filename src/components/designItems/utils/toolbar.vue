@@ -23,8 +23,8 @@ export default {
 
 <style lang="scss" scoped>
 .icon{
-        height: 20px;
-        width: 100%;
+        // height: 20px;
+        // width: 100%;
         background: #ccc;
         i{
             // display: inline-block;

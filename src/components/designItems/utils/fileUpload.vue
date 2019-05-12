@@ -86,7 +86,7 @@ export default {
             files:[]
         }
     },
-    props:['tabindex','fileDone','type'],
+    props:['tabindex','fileDone','type','no'],
     created(){
         console.log('传参键入的参数是：',this.type)
         if(this.type == 'media'){

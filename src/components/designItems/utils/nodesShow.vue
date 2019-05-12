@@ -24,14 +24,14 @@
                                     }" >
                                     <section v-if="item.type == 'tem_hum'">
                                         <i v-if="item.temp_value">{{item.temp_value}}<br>{{item.humi_value}}</i>
-                                        <i v-else>{{item.room_id}}</i>
+                                        <i v-else>{{item.room_id}}离线</i>
                                     </section>
                                     <section v-else-if="item.type == 'air'">
                                         <i v-if="item.nh4">{{item.nh4}}<br>{{item.h2s}}</i>
-                                        <i v-else>{{item.room_id}}</i>
+                                        <i v-else>{{item.room_id}}离线</i>
                                     </section>
                                     <section v-else>
-                                        <i v-if="!item.status">{{item.room_id}}</i>
+                                        <i v-if="!item.status">{{item.room_id}}离线</i>
                                     </section>
 
                                     <div v-if="listenNodesChange%2 == 0">

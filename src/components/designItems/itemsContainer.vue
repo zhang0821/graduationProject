@@ -10,13 +10,7 @@
                 <nodes-show v-if="!tabArr[index].table.hasSet" :infos="tabArr[index].designComponents" :design="'design'" ></nodes-show>
                 <table-gener v-else />
             </div>  
-            <!-- 是否注册了报警 -->
-            <!-- <vue-draggable-resizable  v-if="layoutInfo.warnBox!=null" drag-handle=".marquee_title"  :resizable="true"
-                 :x="layoutInfo.warnBox.left" :y="layoutInfo.warnBox.top" :w="500" :h="100" :minh="30" :minw="50" :parent="true" >
-                <text-scroll-box ></text-scroll-box>
-            </vue-draggable-resizable> -->
-            <!-- <warn-box v-if="layoutInfo.warnBox!=null" :detial-info="layoutInfo.warnBox" :design="true" :dragstop-cb="onDragstop"></warn-box> -->
-            
+          
         </div>
         <!-- 文件上传组件 -->
 

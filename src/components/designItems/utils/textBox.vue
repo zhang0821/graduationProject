@@ -1,7 +1,8 @@
 <template>
 <vue-draggable-resizable  drag-handle='.icon' :resizable="design"  :draggable="design" @dragstop="dragStop" @dragging="onDragging"
                  :x="detialInfo.left" :y="detialInfo.top" :w="detialInfo.width" :h="detialInfo.height" 
-                 :minh="30" :minw="50" :parent="true" :handles="['br']">
+                 :minh="30" :minw="50" >
+                 <!-- :parent="true" :handles="['br']" -->
      <div class="dragtestBox">
         
         <section v-if="design && notSave">
